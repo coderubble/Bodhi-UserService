@@ -13,10 +13,10 @@
         "sourceType": "module"
     },
     "rules": {
-        // "indent": [
-        //     "error",
-        //     "tab"
-        // ],
+        "indent": [
+            "error",
+            "tab"
+        ],
         "quotes": [
             "error",
             "double"
