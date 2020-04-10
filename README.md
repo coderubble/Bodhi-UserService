@@ -22,12 +22,10 @@ This Service is used to manage users of Bodhi application.
 #### Clinic Admin
 ```
 {
-    "donald_trump": {
-        "user_type": "clinic_admin",
-        "email_id": "trump@usa.com",
-        "contact_no": "+9198172398712",
-        "user_name": "dontrm"
-    }
+	"user_name": "donald_trump",
+	"user_type": "C",
+	"email_id": "trump@usa.com",
+	"contact_no": "+9198172398712"
 }
 ```
 
