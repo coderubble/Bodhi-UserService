@@ -66,6 +66,31 @@
             }
           }
         }
+      },
+      "put": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Update users into system",
+        "description": "This can only be done by the logged in user.",
+        "operationId": "updateUser",
+        "produces": "application/xml,application/json",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": "true",
+            "description": "Update user"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/Users"
+            }
+          }
+        }
       }
     }
   },

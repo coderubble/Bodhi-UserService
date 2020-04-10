@@ -2,32 +2,42 @@ const express = require("express");
 const router = express.Router();
 const User = require("../models/user")
 const { validationResult } = require('express-validator/check')
-//const { validationResult } = require('express-validator')
 const { validate } = require('../middleware/validate')
 
 router.get("/", (req, res) => {
-    res.sendStatus(200);
+  User.findAll().then((data) => {
+    res.send(data);
+  }).catch((error) => {
+    res.status(500).send({ message: error.message || "Error occurred while retrieving user data." });
+  });
 });
 
-router.post("/", validate('createUser'), (req, res) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-        return res.status(400).send("errors:"+ JSON.stringify(errors.array()))
-    }
+router.post("/", validate(), (req, res) => {
+  const validationErrors = validationResult(req);
+  if (!validationErrors.isEmpty()) {
+    res.status(400).send(`Validation errors: ${JSON.stringify(validationErrors.array())}`);
+  } else {
     User.create(req.body).then((user) => {
-        console.log('Inserted data into User table')
-    }).then(() => {
-        res.sendStatus(201).json(user);
-    }).catch(() => {
-        res.sendStatus(400);
+      console.log('Inserted data into User table')
+      res.status(201).json(user);
+    }).catch((error) => {
+      res.status(400).send({ message: error.message || "Error occured while inserting user data" });
     });
+  }
 });
 
-router.post('/view', (req, res) => {
-    User.findAll().then(function (user_data) {
-        console.log('View User data')
-    })
-    res.send(user_data)
-})
+router.put("/", validate(), (req, res) => {
+  const validationErrors = validationResult(req);
+  if (!validationErrors.isEmpty()) {
+    res.status(400).send(`Validation errors: ${JSON.stringify(validationErrors.array())}`);
+  } else {
+    User.update(req.body).then((user) => {
+      console.log('Updated User data')
+      res.sendStatus(201).json(user);
+    }).catch((error) => {
+      res.status(400).send({ message: error.message || "Error occured while updating user data" });
+    });
+  }
+});
 
 module.exports = router;
