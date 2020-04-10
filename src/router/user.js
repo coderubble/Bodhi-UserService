@@ -33,11 +33,23 @@ router.put("/", validate(), (req, res) => {
   } else {
     User.update(req.body).then((user) => {
       console.log('Updated User data')
-      res.sendStatus(201).json(user);
+      res.status(201).json(user);
     }).catch((error) => {
       res.status(400).send({ message: error.message || "Error occured while updating user data" });
     });
   }
 });
+
+// This doesn't throw an error if username is invalid.
+// If required,can add findById instead of where clause in destroy method.
+router.delete("/:user_name", (req, res) => {
+  const user_name = req.params.user_name;
+  User.destroy({ where: { user_name } }).then(() => {
+    console.log('Deleted User data')
+    res.sendStatus(200);
+  }).catch((error) => {
+    res.status(400).send({ message: error.message || "Error occured while deleting user data" });
+  });
+})
 
 module.exports = router;

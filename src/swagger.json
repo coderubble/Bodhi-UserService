@@ -92,6 +92,33 @@
           }
         }
       }
+    },
+    "/user/{user_name}": {
+      "delete": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Delete users in system",
+        "description": "This can only be done by the logged in user.",
+        "operationId": "deleteUser",
+        "produces": "application/xml,application/json",
+        "parameters": [
+          {
+            "name": "user_name",
+            "in": "path",
+            "required": "true",
+            "description": "Delete user"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/Users"
+            }
+          }
+        }
+      }
     }
   },
   "definitions": {

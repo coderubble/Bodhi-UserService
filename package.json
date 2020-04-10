@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "mocha './test/**/*.test.js'",
     "lint": "eslint **/*.js",
     "dev": "nodemon src/app.js",
     "debug": "node --inspect-brk src/app.js"
@@ -26,11 +26,15 @@
     "express-validator": "^6.4.0",
     "pg": "^8.0.0",
     "pg-hstore": "^2.3.3",
+    "request": "^2.88.2",
     "sequelize": "^5.21.6",
     "sequelize-cli": "^5.5.1",
     "swagger-ui-express": "^4.1.4"
   },
   "devDependencies": {
-    "eslint": "^6.8.0"
+    "chai": "^4.2.0",
+    "eslint": "^6.8.0",
+    "mocha": "^7.1.1",
+    "sinon": "^9.0.2"
   }
 }
