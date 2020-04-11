@@ -48,11 +48,16 @@ $ create table users(user_name VARCHAR(20) PRIMARY KEY, user_type CHAR NOT NULL,
 ```
 $ psql -h <use the docker IP> -p 5432 -U postgres -W  
 ```
-#### Connection URl
+#### Connection URL
 
 ```
 postgres://YourUserName:YourPassword@YourHost:5432/YourDatabase"
 ```
 
-
-https://github.com/slanatech/swagger-stats
+## TODO 
+#### METRICS & MONITORING.
+* add pagination - see: https://www.npmjs.com/package/sequelize-paginate
+* add env properties for local environments
+* define the layers to test 
+* write integeration test project
+* https://github.com/slanatech/swagger-stats
