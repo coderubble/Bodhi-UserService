@@ -5,7 +5,11 @@ const { validationResult } = require('express-validator/check')
 const { validate } = require('../middleware/validate')
 
 router.get("/", (req, res) => {
-  User.findAll().then((data) => {
+  User.findAndCountAll({
+    limit: req.query.to - req.query.from,
+    offset: req.query.from,
+    order: [["createdAt", "ASC"]]
+  }).then((data) => {
     res.send(data);
   }).catch((error) => {
     res.status(500).send({ message: error.message || "Error occurred while retrieving user data." });

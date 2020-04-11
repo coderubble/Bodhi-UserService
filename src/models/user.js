@@ -10,7 +10,6 @@ const User = sequelize.define(
     contact_no: {type: STRING,allowNull:false}
   }
 );
-
 User.sync().then(() => {
   console.log('User table created')
 });
