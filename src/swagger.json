@@ -110,7 +110,7 @@
         }
       }
     },
-    "/user/{user_name}": {
+    "/user/{email_id}": {
       "delete": {
         "tags": [
           "Users"
@@ -121,7 +121,7 @@
         "produces": "application/xml,application/json",
         "parameters": [
           {
-            "name": "user_name",
+            "name": "email_id",
             "in": "path",
             "required": "true",
             "description": "Delete user"
@@ -145,15 +145,24 @@
         "_id"
       ],
       "properties": {
-        "user_name": {
+        "email_id": {
           "type": "string",
           "uniqueItems": true
+        },
+        "first_name": {
+          "type": "string"
+        },
+        "last_name": {
+          "type": "string"
         },
         "user_type": {
           "type": "string",
           "uniqueItems": true
         },
-        "email_id": {
+        "dob": {
+          "type": "date"
+        },
+        "address": {
           "type": "string"
         },
         "contact_no": {

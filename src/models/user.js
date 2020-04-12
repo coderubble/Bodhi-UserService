@@ -1,12 +1,16 @@
-const { STRING, ENUM } = require("sequelize");
+const { STRING, ENUM, DATE } = require("sequelize");
 const sequelize = require("../db/database");
 
 const User = sequelize.define(
   "users",
   {
-    user_name: { type: STRING, allowNull: false, unique: true, primaryKey: true },
-    user_type: { type: ENUM("S", "C", "P"), allowNull: false },
-    email_id: { type: STRING, allowNull: false, unique: true },
+    email_id: { type: STRING, allowNull: false, unique: true, primaryKey: true },
+    password:{type:STRING,allowNull: false},
+    first_name: { type: STRING,allowNull: false },
+    last_name: { type: STRING,allowNull: false },
+    user_type: { type: ENUM("S", "C", "P", "D"), allowNull: false },
+    dob: { type: DATE },
+    address: { type: STRING,allowNull: false },
     contact_no: { type: STRING, allowNull: false }
   }
 );

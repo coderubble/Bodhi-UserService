@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const bcrypt = require("bcryptjs");
 const User = require("../models/user");
 const { validationResult } = require("express-validator/check");
 const { validate } = require("../middleware/validate");
@@ -17,12 +18,15 @@ router.get("/", (req, res) => {
   });
 });
 
-router.post("/", validate(), (req, res) => {
+router.post("/", validate(), async (req, res) => {
   const validationErrors = validationResult(req);
   if (!validationErrors.isEmpty()) {
     res.status(400).send(`Validation errors: ${JSON.stringify(validationErrors.array())}`);
   } else {
-    User.create(req.body).then((user) => {
+    const { email_id, user_type, first_name, last_name, dob, address, contact_no } = req.body
+    const userData = { email_id, user_type, first_name, last_name, dob, address, contact_no }
+    userData.password = await bcrypt.hash(req.body.password, 10);
+    User.create(userData).then((user) => {
       console.log("Inserted data into User table");
       res.status(201).json(user);
     }).catch((error) => {
@@ -36,7 +40,16 @@ router.put("/", validate(), (req, res) => {
   if (!validationErrors.isEmpty()) {
     res.status(400).send(`Validation errors: ${JSON.stringify(validationErrors.array())}`);
   } else {
-    User.update(req.body).then((user) => {
+    const { first_name, last_name, dob, address, contact_no } = req.body;
+    User.update({
+      first_name,
+      last_name,
+      dob,
+      address,
+      contact_no
+    },
+      { where: { email_id: req.body.email_id } }
+    ).then((user) => {
       console.log("Updated User data");
       res.status(201).json(user);
     }).catch((error) => {
@@ -47,14 +60,19 @@ router.put("/", validate(), (req, res) => {
 
 // This doesn"t throw an error if username is invalid.
 // If required,can add findById instead of where clause in destroy method.
-router.delete("/:user_name", (req, res) => {
-  const user_name = req.params.user_name;
-  User.destroy({ where: { user_name } }).then(() => {
+router.delete("/:email_id", (req, res) => {
+  const email_id = req.params.email_id;
+  User.destroy({ where: { email_id } }).then(() => {
     console.log("Deleted User data");
     res.sendStatus(200);
   }).catch((error) => {
     res.status(400).send({ message: error.message || "Error occured while deleting user data" });
   });
 });
+
+// function getUserDetails(request) {
+//   const { email_id,user_type,first_name, last_name, dob, address, contact_no } = request;
+//   return { email_id,user_type,first_name, last_name, dob, address, contact_no }
+// }
 
 module.exports = router;

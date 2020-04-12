@@ -1,14 +1,18 @@
 const axios = require("axios");
 
-for (let i = 1; i < 2500; i++) {
-  const user_name = `User${i}`;
+for (let i = 1; i < 2; i++) {
+  const name = `seed_user${i}`;
   axios.post("http://localhost:3000/user", {
-    "user_name": `Seed_${user_name}`,
+    "email_id": `${name}@gmail.com`,
+    "password":"123456789",
+    "first_name": name,
+    "last_name": "xxx",
     "user_type": "C",
-    "email_id": `Seed_${user_name}@gmail.com`,
-    "contact_no": "+919876543210"
+    "contact_no": "+9198172398712",
+    "dob": "10-10-1950",
+    "address": "White house, USA"
   }).then(() => {
-    console.log(`inserted ${user_name}`);
+    console.log(`inserted ${name}`);
   }).catch(error => {
     console.error(error.message);
   })
