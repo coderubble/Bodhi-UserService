@@ -10,7 +10,7 @@ const User = sequelize.define(
     first_name: { type: STRING, allowNull: false },
     last_name: { type: STRING, allowNull: false },
     user_type: { type: ENUM("S", "C", "P", "D"), allowNull: false },
-    dob: { type: DATEONLY},
+    dob: { type: DATEONLY },
     address: { type: STRING, allowNull: false },
     contact_no: { type: STRING, allowNull: false }
   }
@@ -20,8 +20,8 @@ User.sync().then(() => {
   console.log("User table created");
 });
 
-User.generateAuthToken = function (email_id) {
-  const token = jwt.sign({ email_id }, process.env.JWT_PRIVATE_KEY);
+User.generateAuthToken = function ({ email_id, password }) {
+  const token = jwt.sign({ email_id, password }, process.env.JWT_PRIVATE_KEY);
   return token;
 }
 

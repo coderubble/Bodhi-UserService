@@ -15,10 +15,16 @@ This Service is used to manage users of Bodhi application.
     "dob":"10-10-1950",
     "address":"White house, USA"
 }
-
-
+```
+## Docker
+#### Docker build image
+```
+$ docker build -t bodhi_user_service .
+$ docker run --name bodhi_user_service -p 3030:3000 bodhi_user_service
+```
 
 #### Starting postgres on docker 
+```
  docker run -d \
     -p 5432:5432 \
     --name userdb \
@@ -26,9 +32,9 @@ This Service is used to manage users of Bodhi application.
     -e PGDATA=/var/lib/postgresql/data/pgdata \
     -v /C/Softwares/PostgreSQL/data:/var/lib/postgresql/data/pgdata \
     userdb
+```
 
 ## TODO 
-* add env properties for local environments
 * define the layers to test 
 * write integeration test project
 * https://github.com/slanatech/swagger-stats

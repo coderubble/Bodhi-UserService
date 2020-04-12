@@ -6,7 +6,7 @@
   "scripts": {
     "test": "mocha './test/**/*.test.js'",
     "lint": "eslint src/**/*.js",
-    "dev": "env-cmd nodemon src/app.js",
+    "dev": "env-cmd -f config/dev.env nodemon src/app.js",
     "debug": "node --inspect-brk src/app.js",
     "seed": "node seed/run.js"
   },

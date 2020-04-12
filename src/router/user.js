@@ -31,7 +31,7 @@ router.post("/", validate(), async (req, res) => {
     userData.password = await bcrypt.hash(req.body.password, 10);
     User.create(userData).then((user) => {
       console.log("Inserted data into User table");
-      const token = User.generateAuthToken(userData.email_id);
+      const token = User.generateAuthToken(userData);
       res.setHeader("x-auth-token", token);
       res.status(201).send(user);
     }).catch((error) => {
