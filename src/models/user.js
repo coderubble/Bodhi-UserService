@@ -1,16 +1,17 @@
-const { STRING, ENUM, DATE } = require("sequelize");
+const { STRING, ENUM, DATEONLY } = require("sequelize");
 const sequelize = require("../db/database");
+const jwt = require('jsonwebtoken');
 
 const User = sequelize.define(
   "users",
   {
     email_id: { type: STRING, allowNull: false, unique: true, primaryKey: true },
-    password:{type:STRING,allowNull: false},
-    first_name: { type: STRING,allowNull: false },
-    last_name: { type: STRING,allowNull: false },
+    password: { type: STRING, allowNull: false },
+    first_name: { type: STRING, allowNull: false },
+    last_name: { type: STRING, allowNull: false },
     user_type: { type: ENUM("S", "C", "P", "D"), allowNull: false },
-    dob: { type: DATE },
-    address: { type: STRING,allowNull: false },
+    dob: { type: DATEONLY},
+    address: { type: STRING, allowNull: false },
     contact_no: { type: STRING, allowNull: false }
   }
 );
@@ -18,5 +19,10 @@ const User = sequelize.define(
 User.sync().then(() => {
   console.log("User table created");
 });
+
+User.generateAuthToken = function (email_id) {
+  const token = jwt.sign({ email_id }, process.env.JWT_PRIVATE_KEY);
+  return token;
+}
 
 module.exports = User;

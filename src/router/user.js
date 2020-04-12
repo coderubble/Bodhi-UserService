@@ -4,12 +4,15 @@ const bcrypt = require("bcryptjs");
 const User = require("../models/user");
 const { validationResult } = require("express-validator/check");
 const { validate } = require("../middleware/validate");
+const auth = require('../middleware/auth');
 
-router.get("/", (req, res) => {
-  var noOfRecords = req.query.to - req.query.from;
+router.get("/", auth, (req, res) => {
+  const to = req.query.to || 1;
+  const offset = req.query.from || 0;
+  const limit = Math.min(25, to - offset);
   User.findAndCountAll({
-    limit: Math.min(noOfRecords, 25),
-    offset: req.query.from,
+    limit,
+    offset,
     order: [["createdAt", "ASC"]]
   }).then((data) => {
     res.send(data);
@@ -28,7 +31,9 @@ router.post("/", validate(), async (req, res) => {
     userData.password = await bcrypt.hash(req.body.password, 10);
     User.create(userData).then((user) => {
       console.log("Inserted data into User table");
-      res.status(201).json(user);
+      const token = User.generateAuthToken(userData.email_id);
+      res.setHeader("x-auth-token", token);
+      res.status(201).send(user);
     }).catch((error) => {
       res.status(400).send({ message: error.message || "Error occured while inserting user data" });
     });

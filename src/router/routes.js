@@ -1,10 +1,9 @@
 const express = require("express");
 const router = express.Router();
 const user = require("./user");
+const misc = require("./misc");
 
 router.use("/user", user);
-router.get("/health", (request, response) => {
-  response.send({ status: "OK" });
-});
+router.use("/", misc);
 
 module.exports = router;
