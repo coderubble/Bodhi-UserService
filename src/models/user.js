@@ -21,7 +21,7 @@ User.sync().then(() => {
 });
 
 User.generateAuthToken = function ({ email_id, password }) {
-  const token = jwt.sign({ email_id, password }, process.env.JWT_PRIVATE_KEY);
+  const token = jwt.sign({ email_id, password }, process.env.JWT_PRIVATE_KEY, { expiresIn: '1m' });
   return token;
 }
 
