@@ -58,13 +58,15 @@
             "name": "from",
             "in": "query",
             "required": "true",
-            "description": "From Record"
+            "description": "From Record",
+            "default": "0"
           },
           {
             "name": "to",
             "in": "query",
             "required": "true",
-            "description": "To Record"
+            "description": "To Record",
+            "default": "10"
           }
         ],
         "responses": {
