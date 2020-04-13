@@ -6,6 +6,27 @@ const { validationResult } = require("express-validator/check");
 const { validate } = require("../middleware/validate");
 const auth = require('../middleware/auth');
 
+router.post("/login", async (req, res) => {
+  const email_id = req.body.email_id;
+  const password = req.body.password;
+  User.findOne({
+    where: { email_id }
+  }).then((user) => {
+    bcrypt.compare(password, user.password, function (error, result) {
+      if (result) {
+        const token = User.generateAuthToken(user);
+        res.setHeader("x-auth-token", token);
+        res.send(token);
+      } else {
+        return res.status(500).send("Incorrect username or password");
+      }
+    });
+  }).catch((error) => {
+    console.log(`Error: ${error}`)
+    res.status(500).send({ message: error.message });
+  });
+});
+
 router.get("/", auth, (req, res) => {
   const to = req.query.to || 1;
   const offset = req.query.from || 0;
@@ -17,7 +38,7 @@ router.get("/", auth, (req, res) => {
   }).then((data) => {
     res.send(data);
   }).catch((error) => {
-    res.status(500).send({ message: error.message || "Error occurred while retrieving user data." });
+    res.status(400).send({ message: error.message || "Error occurred while retrieving user data." });
   });
 });
 
@@ -28,11 +49,11 @@ router.post("/", validate(), async (req, res) => {
   } else {
     const { email_id, user_type, first_name, last_name, dob, address, contact_no } = req.body
     const userData = { email_id, user_type, first_name, last_name, dob, address, contact_no }
-    userData.password = await bcrypt.hash(req.body.password, 10);
+    bcrypt.hash(req.body.password, 10, function (err, hash) {
+      userData.password = hash;
+    });
     User.create(userData).then((user) => {
       console.log("Inserted data into User table");
-      const token = User.generateAuthToken(userData);
-      res.setHeader("x-auth-token", token);
       res.status(201).send(user);
     }).catch((error) => {
       res.status(400).send({ message: error.message || "Error occured while inserting user data" });
@@ -74,10 +95,5 @@ router.delete("/:email_id", (req, res) => {
     res.status(400).send({ message: error.message || "Error occured while deleting user data" });
   });
 });
-
-// function getUserDetails(request) {
-//   const { email_id,user_type,first_name, last_name, dob, address, contact_no } = request;
-//   return { email_id,user_type,first_name, last_name, dob, address, contact_no }
-// }
 
 module.exports = router;
