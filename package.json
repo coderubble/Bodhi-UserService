@@ -1,0 +1,46 @@
+{
+  "name": "BodhiUserService",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha './test/**/*.test.js'",
+    "lint": "eslint src/**/*.js",
+    "dev": "env-cmd -f config/dev.env nodemon src/app.js",
+    "debug": "node --inspect-brk src/app.js",
+    "seed": "node seed/run.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/coderubble/Bodhi-UserService.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/coderubble/Bodhi-UserService/issues"
+  },
+  "homepage": "https://github.com/coderubble/Bodhi-UserService#readme",
+  "dependencies": {
+    "axios": "^0.19.2",
+    "bcryptjs": "^2.4.3",
+    "body-parser": "^1.19.0",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "express-validator": "^6.4.0",
+    "jsonwebtoken": "^8.5.1",
+    "pg": "^8.0.2",
+    "pg-hstore": "^2.3.3",
+    "request": "^2.88.2",
+    "sequelize": "^5.21.6",
+    "sequelize-cli": "^5.5.1",
+    "swagger-ui-express": "^4.1.4"
+  },
+  "devDependencies": {
+    "chai": "^4.2.0",
+    "env-cmd": "^10.1.0",
+    "eslint": "^6.8.0",
+    "mocha": "^7.1.1",
+    "sinon": "^9.0.2"
+  }
+}

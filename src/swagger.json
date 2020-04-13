@@ -1,0 +1,249 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "version": "1.0.0",
+    "title": "BODHI USER SERVICE",
+    "description": "This service is used to manage users of BODHI Application ",
+    "license": {
+      "name": "MIT",
+      "url": "https://opensource.org/licenses/MIT"
+    }
+  },
+  "securityDefinitions": {
+    "JWT": {
+      "type": "apiKey",
+      "name": "x-access-token",
+      "in": "header"
+    }
+  },
+  "security": [
+    {
+      "JWT": []
+    }
+  ],
+  "responses": {
+    "UnauthorizedError": {
+      "description": "Access token is missing or invalid"
+    }
+  },
+  "host": "localhost:3000",
+  "basePath": "/",
+  "tags": [
+    {
+      "name": "Users",
+      "description": "API for users in the system"
+    }
+  ],
+  "schemes": [
+    "http"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/user/login": {
+      "post": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Login",
+        "description": "Login Page",
+        "operationId": "loginUser",
+        "produces": "application/xml,application/json",
+        "parameters": [
+          {
+            "name": "email_id",
+            "in": "body",
+            "required": "true",
+            "description": "Enter e-mail id & password"
+          }         
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/Users"
+            }
+          }
+        }
+      }
+    },
+    "/user": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Get all users in system",
+        "description": "This can only be done by the logged in user.",
+        "operationId": "viewUsers",
+        "produces": "application/xml,application/json",
+        "parameters": [
+          {
+            "name": "from",
+            "in": "query",
+            "required": "true",
+            "description": "From Record",
+            "default": "0"
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "required": "true",
+            "description": "To Record",
+            "default": "10"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/Users"
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Insert users into system",
+        "description": "This can only be done by the logged in user.",
+        "operationId": "insertUser",
+        "produces": "application/xml,application/json",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": "true",
+            "description": "Enter user"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/Users"
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Update users into system",
+        "description": "This can only be done by the logged in user.",
+        "operationId": "updateUser",
+        "produces": "application/xml,application/json",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": "true",
+            "description": "Update user"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/Users"
+            }
+          }
+        }
+      }
+    },
+    "/user/{email_id}": {
+      "delete": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Delete users in system",
+        "description": "This can only be done by the logged in user.",
+        "operationId": "deleteUser",
+        "produces": "application/xml,application/json",
+        "parameters": [
+          {
+            "name": "email_id",
+            "in": "path",
+            "required": "true",
+            "description": "Delete user"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/Users"
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "View my details",
+        "description": "This can only be done by the logged in user.",
+        "operationId": "viewUser",
+        "produces": "application/xml,application/json",
+        "parameters": [
+          {
+            "name": "email_id",
+            "in": "path",
+            "required": "true",
+            "description": "View my Details"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/Users"
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "User": {
+      "required": [
+        "email",
+        "_id"
+      ],
+      "properties": {
+        "email_id": {
+          "type": "string",
+          "uniqueItems": true
+        },
+        "first_name": {
+          "type": "string"
+        },
+        "last_name": {
+          "type": "string"
+        },
+        "user_type": {
+          "type": "string",
+          "uniqueItems": true
+        },
+        "dob": {
+          "type": "date"
+        },
+        "address": {
+          "type": "string"
+        },
+        "contact_no": {
+          "type": "string"
+        }
+      }
+    },
+    "Users": {
+      "type": "array",
+      "$ref": "#/definitions/User"
+    }
+  }
+}
