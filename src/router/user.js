@@ -42,6 +42,17 @@ router.get("/", auth, (req, res) => {
   });
 });
 
+router.get("/:email_id", auth, (req, res) => {
+  const email_id=req.params.email_id;
+  User.findOne({
+    where: { email_id }
+  }).then((user) => {
+    res.send(user);
+  }).catch((error) => {
+    res.status(400).send({ message: error.message || "Error occurred while retrieving user data." });
+  });
+});
+
 router.post("/", validate(), async (req, res) => {
   const validationErrors = validationResult(req);
   if (!validationErrors.isEmpty()) {
@@ -54,7 +65,7 @@ router.post("/", validate(), async (req, res) => {
     });
     User.create(userData).then((user) => {
       console.log("Inserted data into User table");
-      res.status(201).send(user);
+      res.status(201).send(clean(user));
     }).catch((error) => {
       res.status(400).send({ message: error.message || "Error occured while inserting user data" });
     });

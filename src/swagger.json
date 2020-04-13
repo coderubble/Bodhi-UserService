@@ -78,7 +78,7 @@
         ],
         "summary": "Get all users in system",
         "description": "This can only be done by the logged in user.",
-        "operationId": "viewUser",
+        "operationId": "viewUsers",
         "produces": "application/xml,application/json",
         "parameters": [
           {
@@ -171,6 +171,31 @@
             "in": "path",
             "required": "true",
             "description": "Delete user"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/Users"
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "View my details",
+        "description": "This can only be done by the logged in user.",
+        "operationId": "viewUser",
+        "produces": "application/xml,application/json",
+        "parameters": [
+          {
+            "name": "email_id",
+            "in": "path",
+            "required": "true",
+            "description": "View my Details"
           }
         ],
         "responses": {

@@ -20,8 +20,8 @@ User.sync().then(() => {
   console.log("User table created");
 });
 
-User.generateAuthToken = function ({ email_id, password }) {
-  const token = jwt.sign({ email_id, password }, process.env.JWT_PRIVATE_KEY, { expiresIn: '1m' });
+User.generateAuthToken = function ({ email_id, user_type }) {
+  const token = jwt.sign({ email_id, user_type }, process.env.JWT_PRIVATE_KEY, { expiresIn: '1h' });
   return token;
 }
 
