@@ -5,6 +5,7 @@ const User = require("../models/user");
 const { validationResult } = require("express-validator/check");
 const { validate } = require("../middleware/validate");
 const auth = require('../middleware/auth');
+const { clinic, system } = require('../middleware/role_check');
 
 router.post("/login", async (req, res) => {
   const email_id = req.body.email_id;
@@ -22,12 +23,11 @@ router.post("/login", async (req, res) => {
       }
     });
   }).catch((error) => {
-    console.log(`Error: ${error}`)
     res.status(500).send({ message: error.message });
   });
 });
 
-router.get("/", auth, (req, res) => {
+router.get("/", [auth, clinic], (req, res) => {
   const to = req.query.to || 1;
   const offset = req.query.from || 0;
   const limit = Math.min(25, to - offset);
@@ -43,7 +43,7 @@ router.get("/", auth, (req, res) => {
 });
 
 router.get("/:email_id", auth, (req, res) => {
-  const email_id=req.params.email_id;
+  const email_id = req.params.email_id;
   User.findOne({
     where: { email_id }
   }).then((user) => {
@@ -72,10 +72,13 @@ router.post("/", validate(), async (req, res) => {
   }
 });
 
-router.put("/", validate(), (req, res) => {
+router.put("/", [auth, clinic], validate(), (req, res) => {
+  const login_user = req.user.email_id;
   const validationErrors = validationResult(req);
   if (!validationErrors.isEmpty()) {
     res.status(400).send(`Validation errors: ${JSON.stringify(validationErrors.array())}`);
+  } else if (login_user != req.body.email_id) {
+    res.status(401).send('Unauthorised to update this User');
   } else {
     const { first_name, last_name, dob, address, contact_no } = req.body;
     User.update({
@@ -97,7 +100,7 @@ router.put("/", validate(), (req, res) => {
 
 // This doesn"t throw an error if username is invalid.
 // If required,can add findById instead of where clause in destroy method.
-router.delete("/:email_id", (req, res) => {
+router.delete("/:email_id", [auth, system], (req, res) => {
   const email_id = req.params.email_id;
   User.destroy({ where: { email_id } }).then(() => {
     console.log("Deleted User data");
