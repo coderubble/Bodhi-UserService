@@ -58,16 +58,21 @@ router.post("/", validate(), function (req, res) {
   if (!validationErrors.isEmpty()) {
     res.status(400).send(`Validation errors: ${JSON.stringify(validationErrors.array())}`);
   } else {
-    const { email_id, user_type, first_name, last_name, dob, address, contact_no } = req.body;
+    const { email_id, user_type, first_name, last_name, dob, address, contact_no, password } = req.body;
     let userData = { email_id, user_type, first_name, last_name, dob, address, contact_no };
-    bcrypt.hash(req.body.password, process.env.SALT, function (err, hash) {
-      userData.password = hash;
-      User.create(  userData).then((user) => {
-        console.log("Inserted data into User table");
-        res.status(201).send(user);
-      }).catch((error) => {
-        res.status(400).send({ message: error.message || "Error occured while inserting user data" });
-      });
+    bcrypt.hash(password, Number(process.env.SALT), function (err, hash) {
+      if (err) {
+        console.log(err);
+        res.status(500);
+      } else {
+        userData.password = hash;
+        User.create(userData).then((user) => {
+          console.log("Inserted data into User table");
+          res.status(201).send(user);
+        }).catch((error) => {
+          res.status(400).send({ message: error.message || "Error occured while inserting user data" });
+        });
+      }
     });
   }
 });
