@@ -20,18 +20,19 @@ This Service is used to manage users of Bodhi application.
 #### Docker build image
 ```
 $ docker build -t bodhi_user_service .
-$ docker run --name bodhi_user_service -p 3030:3000 bodhi_user_service
+$ docker run \
+-e JWT_PRIVATE_KEY=myprivatekey \
+-e PORT=3000 \
+-e DATABASE_URL=postgres://postgres:my secretpassword@192.168.99.100:5432/userdb 
+-e SALT=10 \
+--name bodhi_user_service \
+-p 3030:3000 \
+bodhi_user_service
 ```
 
 #### Starting postgres on docker 
 ```
- docker run -d \
-    -p 5432:5432 \
-    --name userdb \
-    -e POSTGRES_PASSWORD=mysecretpassword \
-    -e PGDATA=/var/lib/postgresql/data/pgdata \
-    -v /C/Softwares/PostgreSQL/data:/var/lib/postgresql/data/pgdata \
-    userdb
+see [Docs](Docs/DevDb/)
 ```
 
 ## TODO 
