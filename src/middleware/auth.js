@@ -15,6 +15,10 @@ module.exports = function (req, res, next) {
       res.status(400).send("Invalid token.");
     }
   } else {
+    req.user = {
+      email_id: "dummy@gmail.com",
+      user_type: "P"
+    }
     next();
   }
 };
