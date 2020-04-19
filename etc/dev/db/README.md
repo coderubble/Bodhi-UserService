@@ -17,8 +17,7 @@ $ docker volume create \
 --label example=pg \
 localpg
 
-$ PGDATA=/var/lib/postgresql/data/pgdata 
-winpty docker run -d \
+$ docker run -d \
 -p 5432:5432 \
 --name userdb \
 -e POSTGRES_USER=postgres \
