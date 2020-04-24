@@ -1,4 +1,4 @@
-const routes = require("./router/routes");
+const routes = require("./controller/routes");
 const express = require("express");
 const app = express();
 require('dotenv').config();

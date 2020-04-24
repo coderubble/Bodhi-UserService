@@ -1,29 +1,22 @@
 const express = require("express");
 const router = express.Router();
 const bcrypt = require("bcryptjs");
-const User = require("../models/user");
+const UserFactory = require("../repository/user_repository");
+const { userLogin } = require("../service/user");
 const { validationResult } = require("express-validator/check");
 const { validate } = require("../middleware/validate");
-const auth = require('../middleware/auth');
-const { clinic, system } = require('../middleware/role_check');
+const auth = require("../middleware/auth");
+const { clinic, system } = require("../middleware/role_check");
 
 router.post("/login", async (req, res) => {
-  const email_id = req.body.email_id;
-  const password = req.body.password;
-  User.findOne({
-    where: { email_id }
-  }).then((user) => {
-    bcrypt.compare(password, user.password, function (error, result) {
-      if (result) {
-        const token = User.generateAuthToken(user);
-        res.setHeader("x-auth-token", token);
-        res.send(token);
-      } else {
-        return res.status(500).send("Incorrect username or password");
-      }
-    });
-  }).catch((error) => {
-    res.status(500).send({ message: error.message });
+  userLogin(req.body, (error, result) => {
+    if (result) {
+      res.setHeader("x-auth-token", result);
+      res.send(result);
+    }
+    else {
+      res.status(500).send(error || "Incorrect username or password");
+    }
   });
 });
 
@@ -31,7 +24,7 @@ router.get("/", [auth, clinic], (req, res) => {
   const to = req.query.to || 1;
   const offset = req.query.from || 0;
   const limit = Math.min(25, to - offset);
-  User.findAndCountAll({
+  UserFactory.getUser().findAndCountAll({
     limit,
     offset,
     order: [["createdAt", "ASC"]]
@@ -44,7 +37,7 @@ router.get("/", [auth, clinic], (req, res) => {
 
 router.get("/:email_id", auth, (req, res) => {
   const email_id = req.params.email_id;
-  User.findOne({
+  UserFactory.getUser().findOne({
     where: { email_id }
   }).then((user) => {
     res.send(user);
@@ -66,7 +59,7 @@ router.post("/", validate(), function (req, res) {
         res.status(500);
       } else {
         userData.password = hash;
-        User.create(userData).then((user) => {
+        UserFactory.getUser().create(userData).then((user) => {
           console.log("Inserted data into User table");
           res.status(201).send(user);
         }).catch((error) => {
@@ -78,22 +71,21 @@ router.post("/", validate(), function (req, res) {
 });
 
 router.put("/", [auth, clinic], validate(), (req, res) => {
-  const login_user = req.user.email_id;
+  const login_user = req.body.email_id;
   const validationErrors = validationResult(req);
   if (!validationErrors.isEmpty()) {
     res.status(400).send(`Validation errors: ${JSON.stringify(validationErrors.array())}`);
   } else if (login_user != req.body.email_id) {
-    res.status(401).send('Unauthorised to update this User');
+    res.status(401).send("Unauthorised to update this User");
   } else {
     const { first_name, last_name, dob, address, contact_no } = req.body;
-    User.update({
+    UserFactory.getUser().update({
       first_name,
       last_name,
       dob,
       address,
       contact_no
-    },
-      { where: { email_id: req.body.email_id } }
+    }, { where: { email_id: req.body.email_id } }
     ).then((user) => {
       console.log("Updated User data");
       res.status(201).json(user);
@@ -107,7 +99,7 @@ router.put("/", [auth, clinic], validate(), (req, res) => {
 // If required,can add findById instead of where clause in destroy method.
 router.delete("/:email_id", [auth, system], (req, res) => {
   const email_id = req.params.email_id;
-  User.destroy({ where: { email_id } }).then(() => {
+  UserFactory.getUser().destroy({ where: { email_id } }).then(() => {
     console.log("Deleted User data");
     res.sendStatus(200);
   }).catch((error) => {
