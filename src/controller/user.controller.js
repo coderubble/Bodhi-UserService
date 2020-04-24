@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const bcrypt = require("bcryptjs");
 const UserFactory = require("../repository/user_repository");
-const { userLogin } = require("../service/user");
+const { userLogin, userGetAll, userGetByEmail } = require("../service/user.service");
 const { validationResult } = require("express-validator/check");
 const { validate } = require("../middleware/validate");
 const auth = require("../middleware/auth");
@@ -21,29 +21,25 @@ router.post("/login", async (req, res) => {
 });
 
 router.get("/", [auth, clinic], (req, res) => {
-  const to = req.query.to || 1;
-  const offset = req.query.from || 0;
-  const limit = Math.min(25, to - offset);
-  UserFactory.getUser().findAndCountAll({
-    limit,
-    offset,
-    order: [["createdAt", "ASC"]]
-  }).then((data) => {
-    res.send(data);
-  }).catch((error) => {
-    res.status(400).send({ message: error.message || "Error occurred while retrieving user data." });
+  userGetAll(req.query, (error, result) => {
+    if (result) {
+      res.send(result);
+    }
+    else {
+      res.status(400).send({ message: error.message || "Error occurred while retrieving user data." });
+    }
   });
 });
 
 router.get("/:email_id", auth, (req, res) => {
-  const email_id = req.params.email_id;
-  UserFactory.getUser().findOne({
-    where: { email_id }
-  }).then((user) => {
-    res.send(user);
-  }).catch((error) => {
-    res.status(400).send({ message: error.message || "Error occurred while retrieving user data." });
-  });
+  userGetByEmail(req.params, (error, result) => {
+    if (result) {
+      res.send(result);
+    }
+    else {
+      res.status(400).send({ message: error.message || "Error occurred while retrieving user data by email" });
+    }
+  })
 });
 
 router.post("/", validate(), function (req, res) {
