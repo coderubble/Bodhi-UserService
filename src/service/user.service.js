@@ -13,7 +13,8 @@ exports.userLogin = function ({ email_id, password }, callback) {
       }
     });
   }).catch((error) => {
-    callback(error);
+    console.log(`Error: ${error}`);
+    callback("User not found");
   });
 };
 
@@ -75,16 +76,16 @@ exports.userUpdate = function ({ email_id, first_name, last_name, dob, address, 
     contact_no
   }, {
     where: { email_id }
-  }).then((user) => {
-    callback(null, { message: `Updated Record: ${user.email_id}` });
+  }).then((result) => {
+    callback(null, { message: `Updated Record: ${result}` });
   }).catch((error) => {
     callback(error);
   });
 };
 
 exports.userDelete = function ({ email_id }, callback) {
-  UserFactory.getUser().destroy({ where: { email_id } }).then((user) => {
-    callback(null, { message: `Deleted Record: ${user.email_id}` });
+  UserFactory.getUser().destroy({ where: { email_id } }).then((result) => {
+    callback(null, { message: `Deleted Record: ${result}` });
   }).catch((error) => {
     callback(error);
   });

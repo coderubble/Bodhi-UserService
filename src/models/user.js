@@ -16,9 +16,7 @@ const User = sequelize.define(
   }
 );
 
-User.sync().then(() => {
-  console.log("User table created");
-});
+User.sync();
 
 User.generateAuthToken = function ({ email_id, user_type }) {
   const token = jwt.sign({ email_id, user_type }, process.env.JWT_PRIVATE_KEY, { expiresIn: "1h" });
