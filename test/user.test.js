@@ -1,12 +1,11 @@
 const { userLogin, userGetByEmail, userInsert } = require("../src/service/user.service");
 const sandbox = require("sinon").createSandbox();
-const bcrypt = require("bcryptjs");
 const UserFactory = require("../src/repository/user_repository");
 const { expect } = require("chai");
 const { describe, it, beforeEach, afterEach } = require("mocha");
 let User = { findOne: function () { }, generateAuthToken: function () { }, create: function () { } };
 const email_id = "trump@usa.com";
-let user_detail = {
+const user_detail = {
   email_id,
   "password": "trump123",
   "first_name": "Donald",
@@ -16,6 +15,17 @@ let user_detail = {
   "dob": "10-10-1950",
   "address": "White house, USA"
 };
+const masked_user_output = {
+  "email_id": "trump@usa.com",
+  "password": "******",
+  "first_name": "Donald",
+  "last_name": "Trump",
+  "user_type": "S",
+  "contact_no": "+9198172398712",
+  "dob": "10-10-1950",
+  "address": "White house, USA"
+};
+let output = { toJSON: () => user_detail };
 describe("Check User Login", () => {
   beforeEach(function () {
     sandbox.stub(User, "findOne").withArgs({
@@ -63,12 +73,12 @@ describe("Check View User by email-id", () => {
   it("Should return Details of given email-id", (done) => {
     sandbox.stub(User, "findOne").withArgs({
       where: { email_id }
-    }).returns(Promise.resolve(Object.assign({}, user_detail)));
+    }).returns(Promise.resolve(Object.assign({}, output)));
     sandbox.stub(UserFactory, "getUser").returns(User);
 
     userGetByEmail({ email_id }, function (error, result) {
       if (result) {
-        expect(result).to.eql(user_detail);
+        expect(result).to.eql([masked_user_output]);
         done();
       } else {
         console.log(`Error: ${error}`);
@@ -90,7 +100,7 @@ describe("Check hashed password", () => {
 
     userInsert(user_detail, function (error, result) {
       if (result) {
-        expect(result).to.eql({message: "Created Record: trump@usa.com"});
+        expect(result).to.eql({ message: "Created Record: trump@usa.com" });
         done();
       } else {
         console.log(`Error: ${error}`);

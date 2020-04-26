@@ -8,7 +8,8 @@
     "lint": "eslint src/**/*.js",
     "dev": "env-cmd -f config/dev.env nodemon src/app.js",
     "debug": "node --inspect-brk src/app.js",
-    "seed": "node seed/run.js"
+    "seed": "node seed/run.js",
+    "coverage": "nyc --reporter html --reporter text npm test"
   },
   "repository": {
     "type": "git",
@@ -40,7 +41,9 @@
     "chai": "^4.2.0",
     "env-cmd": "^10.1.0",
     "eslint": "^6.8.0",
+    "istanbul": "^0.4.5",
     "mocha": "^7.1.1",
+    "nyc": "^15.0.1",
     "sinon": "^9.0.2"
   }
 }
