@@ -1,6 +1,6 @@
 const { STRING, ENUM, DATEONLY } = require("sequelize");
 const sequelize = require("../db/database");
-const jwt = require('jsonwebtoken');
+const jwt = require("jsonwebtoken");
 
 const User = sequelize.define(
   "users",
@@ -21,8 +21,8 @@ User.sync().then(() => {
 });
 
 User.generateAuthToken = function ({ email_id, user_type }) {
-  const token = jwt.sign({ email_id, user_type }, process.env.JWT_PRIVATE_KEY, { expiresIn: '1h' });
+  const token = jwt.sign({ email_id, user_type }, process.env.JWT_PRIVATE_KEY, { expiresIn: "1h" });
   return token;
-}
+};
 
 module.exports = User;

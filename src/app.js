@@ -8,7 +8,7 @@ const swaggerDocument = require("./swagger.json");
 app.use(express.json());
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument, { explorer: true }));
 app.use("/", routes);
-
+require("./repository/user_repository").getUser();
 app.listen(PORT, function () {
   console.log("Server is running at Port " + PORT);
 });

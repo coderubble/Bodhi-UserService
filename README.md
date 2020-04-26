@@ -5,19 +5,21 @@ This Service is used to manage users of Bodhi application.
 ### Sample User request
 #### Create User:
 ```
- {
-    "email_id": "trump@usa.com",   
-    "password":"trump123",
-    "first_name":"Donald",
-    "last_name":"Trump",
-    "user_type": "S",
-    "contact_no": "+9198172398712",
-    "dob":"10-10-1950",
-    "address":"White house, USA"
-}
+    {
+        "email_id": "trump@usa.com",   
+        "password":"trump123",
+        "first_name":"Donald",
+        "last_name":"Trump",
+        "user_type": "S",
+        "contact_no": "+9198172398712",
+        "dob":"10-10-1950",
+        "address":"White house, USA"
+    }
 ```
 ### input for authentication
-```{"email_id": "trump@usa.com","password":"trump123"}```
+```
+{"email_id": "trump@usa.com","password":"trump123"}
+```
 
 ## Docker
 #### Testing on Docker 

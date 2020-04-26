@@ -7,7 +7,10 @@ const sequelize = new Sequelize(
   enviroment.POSTGRES_PASSWORD,
   {
     host: enviroment.POSTGRES_HOST,
-    dialect: "postgres"
+    dialect: "postgres",
+    define: {
+      timestamps: false
+    }
   }
 );
 module.exports = sequelize;

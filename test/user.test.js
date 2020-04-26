@@ -1,9 +1,11 @@
-const { userLogin, userGetByEmail } = require("../src/service/user.service");
-const sandbox = require('sinon').createSandbox();
+const { userLogin, userGetByEmail, userInsert } = require("../src/service/user.service");
+const sandbox = require("sinon").createSandbox();
+const bcrypt = require("bcryptjs");
 const UserFactory = require("../src/repository/user_repository");
 const { expect } = require("chai");
-let User = { findOne: function () { }, generateAuthToken: function () { } };
-const email_id = "trump@usa.com"
+const { describe, it, beforeEach, afterEach } = require("mocha");
+let User = { findOne: function () { }, generateAuthToken: function () { }, create: function () { } };
+const email_id = "trump@usa.com";
 let user_detail = {
   email_id,
   "password": "trump123",
@@ -16,7 +18,7 @@ let user_detail = {
 };
 describe("Check User Login", () => {
   beforeEach(function () {
-    sandbox.stub(User, 'findOne').withArgs({
+    sandbox.stub(User, "findOne").withArgs({
       where: { email_id }
     }).returns(Promise.resolve({
       email_id,
@@ -30,10 +32,10 @@ describe("Check User Login", () => {
     sandbox.restore();
   });
 
-  it('should Passwords match', (done) => {
+  it("should Passwords match", (done) => {
     const email_id = "trump@usa.com";
     const password = "trump123";
-    sandbox.stub(User, 'generateAuthToken').returns("some token");
+    sandbox.stub(User, "generateAuthToken").returns("some token");
     userLogin({ email_id, password }, function (error, result) {
       if (result) {
         done();
@@ -41,17 +43,17 @@ describe("Check User Login", () => {
     });
   });
 
-  it('should throw a mismatch', (done) => {
+  it("should throw a mismatch", (done) => {
     const email_id = "trump@usa.com";
     const password = "trump1234";
-    userLogin({ email_id, password }, function (error, result) {
+    userLogin({ email_id, password }, function (error) {
       if (error) {
         expect(error).equal("Incorrect Username or Password");
         done();
       }
     });
   });
-})
+});
 
 describe("Check View User by email-id", () => {
   afterEach(function () {
@@ -59,7 +61,7 @@ describe("Check View User by email-id", () => {
   });
 
   it("Should return Details of given email-id", (done) => {
-    sandbox.stub(User, 'findOne').withArgs({
+    sandbox.stub(User, "findOne").withArgs({
       where: { email_id }
     }).returns(Promise.resolve(Object.assign({}, user_detail)));
     sandbox.stub(UserFactory, "getUser").returns(User);
@@ -72,5 +74,27 @@ describe("Check View User by email-id", () => {
         console.log(`Error: ${error}`);
       }
     });
-  })
+  });
+});
+
+
+describe("Check hashed password", () => {
+  afterEach(function () {
+    sandbox.restore();
+  });
+
+  it("Should insert hashed password", (done) => {
+    sandbox.stub(User, "create")
+      .returns(Promise.resolve({ email_id }));
+    sandbox.stub(UserFactory, "getUser").returns(User);
+
+    userInsert(user_detail, function (error, result) {
+      if (result) {
+        expect(result).to.eql({message: "Created Record: trump@usa.com"});
+        done();
+      } else {
+        console.log(`Error: ${error}`);
+      }
+    });
+  });
 });
