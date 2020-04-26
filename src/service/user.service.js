@@ -25,10 +25,8 @@ exports.userGetAll = function ({ from, to }, callback) {
     limit,
     offset,
     order: [["email_id", "ASC"]]
-  },{ plain: true }).then((users) => {
-    
-    users=users.rows;
-    callback(null, users.map(user => maskedUser(user)));
+  }, { plain: true }).then((users) => {
+    callback(null, maskedUser(users.rows));
   }).catch((error) => {
     callback(error);
   });
@@ -44,8 +42,11 @@ exports.userGetByEmail = function ({ email_id }, callback) {
   });
 };
 
-function maskedUser(user) {
-  return Object.assign({}, { ...user.toJSON(), password: "******" });
+function maskedUser(users) {
+  if (!Array.isArray(users)) {
+    users = [users];
+  }
+  return users.map(user => Object.assign({}, { ...user.toJSON(), password: "******" }));
 }
 
 exports.userInsert = function ({ email_id, user_type, first_name, last_name, dob, address, contact_no, password }, callback) {
