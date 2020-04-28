@@ -2,12 +2,8 @@ const request = require("supertest");
 const db = require("../src/db/database")
 const sinon = require("sinon");
 const { Sequelize } = require("sequelize");
-sinon.stub(db, "sequelize").returns(new Sequelize('sqlite::memory:'));
-const app = require("../src/app");
-const db = require("../src/db/database")
-const sinon = require("sinon");
-const { Sequelize } = require("sequelize");
 sinon.stub(db, "sequelize").returns(new Sequelize('sqlite::memory:') );
+const app = require("../src/app"); // This line must be after the sequalize stub creation.
 
 describe("User Service", () => {
   let server;
