@@ -1,27 +1,29 @@
 const request = require("supertest");
-const db = require("../src/db/database")
-const sinon = require("sinon");
-const { Sequelize } = require("sequelize");
-sinon.stub(db, "sequelize").returns(new Sequelize('sqlite::memory:'));
 const app = require("../src/app");
-const db = require("../src/db/database")
-const sinon = require("sinon");
+const proxyquire =  require('proxyquire')
 const { Sequelize } = require("sequelize");
-sinon.stub(db, "sequelize").returns(new Sequelize('sqlite::memory:') );
+const sequelize = new Sequelize('sqlite::memory:') 
+const User = proxyquire('../src/models/user', { 'sequelize': sequelize },{ '../db/database': sequelize });
+const sandbox = require("sinon").createSandbox();
+const UserRepository = require("../src/repository/user.repository");
+sandbox.stub(UserRepository, "getUser").returns(User);
 
 describe("User Service", () => {
-  let server;
-  beforeAll(async (done) => {
-    server = app.listen(4500, () => {
-      global.agent = request.agent(server);
-      done();
-    });
+  beforeAll(async () => {
+    console.log("Inside before all");
+    try {
+      const login = await request(app)
+        .post("/user/login")
+        .send({ "email_id": "scott@usa.com", "password": "scott123" });
+      const token = login.header["x-auth-token"];
+      const res = await request(app)
+        .delete("/user/scott%40usa.com")
+        .set('x-access-token', token);
+    } catch (error) {
+      console.log(`>>Catch Error: ${error}`);
+    }
   });
 
-  afterAll(async () => {
-    await server.close();
-  });
-  
   test("Create User", async () => {
     const res = await request(app)
       .post("/user")
@@ -36,7 +38,7 @@ describe("User Service", () => {
         "address": "White house, USA"
       });
     expect(res.statusCode).toEqual(201);
-  }, 30000);
+  });
 
   test("Login Failure", async () => {
     const res = await request(app)
