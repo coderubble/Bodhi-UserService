@@ -1,12 +1,14 @@
 const request = require("supertest");
 const app = require("../src/app");
-const db = require("../src/db/database")
-const sinon = require("sinon");
+const proxyquire =  require('proxyquire')
 const { Sequelize } = require("sequelize");
-sinon.stub(db, "sequelize").returns(new Sequelize('sqlite::memory:') );
+const sequelize = new Sequelize('sqlite::memory:') 
+const User = proxyquire('../src/models/user', { 'sequelize': sequelize },{ '../db/database': sequelize });
+const sandbox = require("sinon").createSandbox();
+const UserRepository = require("../src/repository/user.repository");
+sandbox.stub(UserRepository, "getUser").returns(User);
 
 describe("User Service", () => {
-
   beforeAll(async () => {
     console.log("Inside before all");
     try {
