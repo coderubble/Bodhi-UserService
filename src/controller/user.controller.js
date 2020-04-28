@@ -5,7 +5,6 @@ const { validationResult } = require("express-validator");
 const { validate } = require("../middleware/validate");
 const auth = require("../middleware/auth");
 const { clinic, system } = require("../middleware/role_check");
-
 router.post("/login", async (req, res) => {
   console.log(`Inside login controller:${JSON.stringify(req.body)}`);
 
@@ -52,7 +51,6 @@ router.post("/", validate(), function (req, res) {
   } else {
     userInsert(req.body, (error, result) => {
       if (result) {
-        console.log("Inserted data into User table");
         res.status(201).send(result);
       }
       else {
@@ -73,7 +71,6 @@ router.put("/", [auth, clinic], validate(), (req, res) => {
   } else {
     userUpdate(req.body, (error, result) => {
       if (result) {
-        console.log("Updated User data");
         res.status(201).json(result);
       }
       else {
@@ -90,7 +87,6 @@ router.delete("/:email_id", [auth, system], (req, res) => {
   console.log(`Inside Delete controller:${JSON.stringify(req.params)}`);
   userDelete(req.params, (error, result) => {
     if (result) {
-      console.log(`Deleted User data${result}`);
       res.sendStatus(200);
     }
     else {

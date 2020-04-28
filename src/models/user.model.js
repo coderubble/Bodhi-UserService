@@ -1,8 +1,8 @@
 const { STRING, ENUM, DATEONLY } = require("sequelize");
-const sequelize = require("../db/database");
+const { sequelize } = require("../db/database");
 const jwt = require("jsonwebtoken");
 
-const User = sequelize.define(
+const User = sequelize().define(
   "users",
   {
     email_id: { type: STRING, allowNull: false, unique: true, primaryKey: true },

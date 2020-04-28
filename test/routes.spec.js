@@ -1,21 +1,21 @@
 const request = require("supertest");
-const app = require("../src/app");
+const db = require("../src/db/database")
+const sinon = require("sinon");
+const { Sequelize } = require("sequelize");
+sinon.stub(db, "sequelize").returns(new Sequelize('sqlite::memory:'));
+const app = require("../src/app"); // This line must be after the sequalize stub creation.
 
 describe("User Service", () => {
+  let server;
+  beforeAll(async (done) => {
+    server = app.listen(4500, () => {
+      global.agent = request.agent(server);
+      done();
+    });
+  });
 
-  beforeAll(async () => {
-    console.log("Inside before all");
-    try {
-      const login = await request(app)
-        .post("/user/login")
-        .send({ "email_id": "scott@usa.com", "password": "scott123" });
-      const token = login.header["x-auth-token"];
-      const res = await request(app)
-        .delete("/user/scott%40usa.com")
-        .set('x-access-token', token);
-    } catch (error) {
-      console.log(`>>Catch Error: ${error}`);
-    }
+  afterAll(async () => {
+    await server.close();
   });
 
   test("Create User", async () => {
@@ -32,7 +32,7 @@ describe("User Service", () => {
         "address": "White house, USA"
       });
     expect(res.statusCode).toEqual(201);
-  });
+  }, 30000);
 
   test("Login Failure", async () => {
     const res = await request(app)
