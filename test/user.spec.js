@@ -1,6 +1,6 @@
 const { userLogin, userGetByEmail, userInsert, userGetAll, userUpdate, userDelete } = require("../src/service/user.service");
 const sandbox = require("sinon").createSandbox();
-const UserFactory = require("../src/repository/user_repository");
+const UserRepository = require("../src/repository/user.repository");
 const { expect } = require("chai");
 let User = { findOne: function () { }, generateAuthToken: function () { }, create: function () { }, findAndCountAll: function () { } };
 const trumps_email_id = "trump@usa.com";
@@ -41,7 +41,7 @@ describe("Check User Login", () => {
       "password": "$2a$10$I.Q77XsVod7SqASqnyd2IOo4ZMjNTps4OQSGJmcSCG4shan2bbEjC",
       "user_type": "P"
     }));
-    sandbox.stub(UserFactory, "getUser").returns(User);
+    sandbox.stub(UserRepository, "getUser").returns(User);
   });
 
   afterEach(function () {
@@ -76,7 +76,7 @@ describe("Check for User Login(User does not exist)", () => {
     sandbox.stub(User, "findOne").withArgs({
       where: { email_id: trumps_email_id }
     }).returns(Promise.reject());
-    sandbox.stub(UserFactory, "getUser").returns(User);
+    sandbox.stub(UserRepository, "getUser").returns(User);
 
     userLogin({ email_id: trumps_email_id, password: trumps_password }, function (error) {
       if (error) {
@@ -96,7 +96,7 @@ describe("Check View User by email-id", () => {
     sandbox.stub(User, "findOne").withArgs({
       where: { email_id: trumps_email_id }
     }).returns(Promise.resolve(Object.assign({}, seqed(trump))));
-    sandbox.stub(UserFactory, "getUser").returns(User);
+    sandbox.stub(UserRepository, "getUser").returns(User);
 
     userGetByEmail({ email_id: trumps_email_id }, function (error, result) {
       if (result) {
@@ -115,7 +115,7 @@ describe("Check View All Users", () => {
   });
   it("Should return Details of all users", (done) => {
     sandbox.stub(User, "findAndCountAll").returns(Promise.resolve(Object.assign({}, users)));
-    sandbox.stub(UserFactory, "getUser").returns(User);
+    sandbox.stub(UserRepository, "getUser").returns(User);
     const from = 0;
     const to = 10;
     userGetAll({ from, to }, function (error, result) {
@@ -138,7 +138,7 @@ describe("Check hashed password", () => {
   it("Should insert hashed password", (done) => {
     sandbox.stub(User, "create")
       .returns(Promise.resolve({ email_id: trumps_email_id }));
-    sandbox.stub(UserFactory, "getUser").returns(User);
+    sandbox.stub(UserRepository, "getUser").returns(User);
 
     userInsert(trump, function (error, result) {
       if (result) {
