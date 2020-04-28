@@ -1,13 +1,13 @@
-const UserRepository = require("../repository/user.repository");
+const User = require("../models/user.model");
 const bcrypt = require("bcryptjs");
 
 exports.userLogin = function ({ email_id, password }, callback) {
-  UserRepository.getUser().findOne({
+  User.findOne({
     where: { email_id }
   }).then((user) => {
     bcrypt.compare(password, user.password, function (error, result) {
       if (result) {
-        callback(null, UserRepository.getUser().generateAuthToken(user));
+        callback(null, User.generateAuthToken(user));
       } else {
         callback("Incorrect Username or Password");
       }
@@ -22,7 +22,7 @@ exports.userGetAll = function ({ from, to }, callback) {
   const to_record = to || 1;
   const offset = from || 0;
   const limit = Math.min(25, to_record - offset);
-  UserRepository.getUser().findAndCountAll({
+  User.findAndCountAll({
     limit,
     offset,
     order: [["email_id", "ASC"]]
@@ -34,7 +34,7 @@ exports.userGetAll = function ({ from, to }, callback) {
 };
 
 exports.userGetByEmail = function ({ email_id }, callback) {
-  UserRepository.getUser().findOne({
+  User.findOne({
     where: { email_id }
   }).then((user) => {
     callback(null, maskedUser(user));
@@ -55,7 +55,7 @@ exports.userInsert = function ({ email_id, user_type, first_name, last_name, dob
   bcrypt.hash(password, Number(process.env.SALT), function (err, hash) {
     if (hash) {
       userData.password = hash;
-      UserRepository.getUser().create(userData).then((user) => {
+      User.create(userData).then((user) => {
         callback(null, { message: `Created Record: ${user.email_id}` });
       }).catch((error) => {
         callback(error);
@@ -68,7 +68,7 @@ exports.userInsert = function ({ email_id, user_type, first_name, last_name, dob
 };
 
 exports.userUpdate = function ({ email_id, first_name, last_name, dob, address, contact_no }, callback) {
-  UserRepository.getUser().update({
+  User.update({
     first_name,
     last_name,
     dob,
@@ -84,7 +84,7 @@ exports.userUpdate = function ({ email_id, first_name, last_name, dob, address, 
 };
 
 exports.userDelete = function ({ email_id }, callback) {
-  UserRepository.getUser().destroy({ where: { email_id } }).then((result) => {
+  User.destroy({ where: { email_id } }).then((result) => {
     callback(null, { message: `Deleted Record: ${result}` });
   }).catch((error) => {
     callback(error);

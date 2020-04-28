@@ -5,7 +5,6 @@ const { validationResult } = require("express-validator");
 const { validate } = require("../middleware/validate");
 const auth = require("../middleware/auth");
 const { clinic, system } = require("../middleware/role_check");
-
 router.post("/login", async (req, res) => {
   console.log(`Inside login controller:${JSON.stringify(req.body)}`);
 
