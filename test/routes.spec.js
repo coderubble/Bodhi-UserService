@@ -3,11 +3,7 @@ const db = require("../src/db/database")
 const sinon = require("sinon");
 const { Sequelize } = require("sequelize");
 sinon.stub(db, "sequelize").returns(new Sequelize('sqlite::memory:'));
-const app = require("../src/app");
-const db = require("../src/db/database")
-const sinon = require("sinon");
-const { Sequelize } = require("sequelize");
-sinon.stub(db, "sequelize").returns(new Sequelize('sqlite::memory:') );
+const app = require("../src/app"); // This line must be after the sequalize stub creation.
 
 describe("User Service", () => {
   let server;
@@ -21,7 +17,7 @@ describe("User Service", () => {
   afterAll(async () => {
     await server.close();
   });
-  
+
   test("Create User", async () => {
     const res = await request(app)
       .post("/user")
