@@ -2,7 +2,7 @@
 ## Overview
 This Service is used to manage users of Bodhi application.
 
-### Sample User request
+## Sample User request
 #### Create User:
 ```
     {
