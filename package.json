@@ -4,12 +4,11 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "env-cmd -f config/test.env jest --config ./jest.config.json",
+    "test": "env-cmd -f config/test.env jest --config ./jest.config.json --coverage",
     "lint": "eslint src/**/*.js",
     "dev": "env-cmd -f config/dev.env nodemon src/app.js",
     "debug": "node --inspect-brk src/app.js",
-    "seed": "node seed/run.js",
-    "coverage": "nyc --reporter html --reporter text npm test"
+    "seed": "node seed/run.js"
   },
   "repository": {
     "type": "git",
@@ -43,7 +42,6 @@
     "eslint": "^6.8.0",
     "istanbul": "^0.4.5",
     "jest": "^25.4.0",
-    "nyc": "^15.0.1",
     "sinon": "^9.0.2",
     "sqlite3": "^4.2.0",
     "supertest": "^4.0.2"
