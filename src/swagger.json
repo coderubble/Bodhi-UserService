@@ -26,7 +26,7 @@
       "description": "Access token is missing or invalid"
     }
   },
-  "host": "localhost:3000",
+  "host": "localhost:3001",
   "basePath": "/",
   "tags": [
     {

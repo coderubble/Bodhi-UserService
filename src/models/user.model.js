@@ -9,7 +9,7 @@ const User = sequelize().define(
     password: { type: STRING, allowNull: false },
     first_name: { type: STRING, allowNull: false },
     last_name: { type: STRING, allowNull: false },
-    user_type: { type: ENUM("S", "C", "P", "D"), allowNull: false },
+    user_type: { type: ENUM("S", "A", "U", "P"), allowNull: false },
     dob: { type: DATEONLY },
     address: { type: STRING, allowNull: false },
     contact_no: { type: STRING, allowNull: false }

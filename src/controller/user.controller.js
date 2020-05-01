@@ -4,7 +4,7 @@ const { userLogin, userGetAll, userGetByEmail, userInsert, userUpdate, userDelet
 const { validationResult } = require("express-validator");
 const { validate } = require("../middleware/validate");
 const auth = require("../middleware/auth");
-const { clinic, system } = require("../middleware/role_check");
+const { clinic, system, insert_usertype_check } = require("../middleware/role_check");
 router.post("/login", async (req, res) => {
   console.log(`Inside login controller:${JSON.stringify(req.body)}`);
 
@@ -44,7 +44,7 @@ router.get("/:email_id", auth, (req, res) => {
   })
 });
 
-router.post("/", validate(), function (req, res) {
+router.post("/", insert_usertype_check, validate(), function (req, res) {
   const validationErrors = validationResult(req);
   if (!validationErrors.isEmpty()) {
     res.status(400).send(`Validation errors: ${JSON.stringify(validationErrors.array())}`);
