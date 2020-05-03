@@ -1,4 +1,5 @@
 const jwt = require("jsonwebtoken");
+const { decode_token } = require("../utility/token");
 const clinic = (req, res, next) => {
   if (req.user.user_type === 'C' || req.user.user_type === 'S') {
     next();
@@ -15,26 +16,28 @@ const system = (req, res, next) => {
 }
 
 const insert_usertype_check = (req, res, next) => {
-  const user_type = req.body.user_type;
-  if (user_type === 'P') {
+  const insert_usertype = req.body.user_type;
+  if (insert_usertype === 'P') {
     next();
   } else {
     const token = req.headers["x-access-token"] || req.headers["authorization"];
     if (!token) return res.status(401).send("Access denied. No token provided.");
     try {
-      const decoded = jwt.verify(token, process.env.JWT_PRIVATE_KEY);
-      if (user_type === 'U') {
-        if (!['A', 'S'].includes(decoded.user_type)) throw ({ message: "Not authenticated to insert Clinic User" });
-      } else if (user_type === 'A') {
-        if (!decoded.user_type === 'S') throw ({ message: "Not authenticated to insert Clinic User" });
-      } else if (user_type === 'S') {
-        throw ({ message: "Cannot insert System Admin" });
-      } else {
-        throw ({ message: "Invalid User" });
-      }
-      next();
+      decode_token(token, ({ user_type }) => {
+        if (insert_usertype === 'U') {
+          if (!['A', 'S'].includes(user_type)) throw ({ message: "Not authenticated to insert Clinic User" });
+        } else if (insert_usertype === 'A') {
+          if (!user_type === 'S') throw ({ message: "Not authenticated to insert Clinic User" });
+        } else if (insert_usertype === 'S') {
+          throw ({ message: "Cannot insert System Admin" });
+        } else {
+          throw ({ message: "Invalid User" });
+        }
+        next();
+      });
+
     } catch (ex) {
-      console.log(`Catch error:${JSON.verify(ex)}`);
+      console.log(`Catch error:${JSON.stringify(ex)}`);
       res.status(403).send(ex);
     }
   }

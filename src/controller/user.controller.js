@@ -4,10 +4,10 @@ const { userLogin, userGetAll, userGetByEmail, userInsert, userUpdate, userDelet
 const { validationResult } = require("express-validator");
 const { validate } = require("../middleware/validate");
 const auth = require("../middleware/auth");
+const { decode_token } = require("../utility/token");
 const { clinic, system, insert_usertype_check } = require("../middleware/role_check");
 router.post("/login", async (req, res) => {
   console.log(`Inside login controller:${JSON.stringify(req.body)}`);
-
   userLogin(req.body, (error, result) => {
     if (result) {
       res.setHeader("x-auth-token", result);
@@ -49,6 +49,13 @@ router.post("/", insert_usertype_check, validate(), function (req, res) {
   if (!validationErrors.isEmpty()) {
     res.status(400).send(`Validation errors: ${JSON.stringify(validationErrors.array())}`);
   } else {
+    const token = req.headers["x-access-token"] || req.headers["authorization"];
+    if (token) {
+      decode_token(token, ({ email_id, user_type, clinic_id }) => {
+        console.log(`>>>>controller:email_id:${email_id},usertype:${user_type},clinicid:${clinic_id}`);
+        req.body.clinic_id = clinic_id;
+      })
+    }
     userInsert(req.body, (error, result) => {
       if (result) {
         res.status(201).send(result);

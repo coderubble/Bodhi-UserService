@@ -1,6 +1,6 @@
 const { STRING, ENUM, DATEONLY } = require("sequelize");
 const { sequelize } = require("../db/database");
-const jwt = require("jsonwebtoken");
+const ClinicUser = require("./clinic_user.model");
 
 const User = sequelize().define(
   "users",
@@ -13,14 +13,14 @@ const User = sequelize().define(
     dob: { type: DATEONLY },
     address: { type: STRING, allowNull: false },
     contact_no: { type: STRING, allowNull: false }
+  }, {
+  classMethods: {
+    associate: function (models) {
+      User.hasOne(ClinicUser, { foreignKey: 'user_id', sourceKey: 'email_id' });
+    }
   }
+}
 );
-
 User.sync();
-
-User.generateAuthToken = function ({ email_id, user_type }) {
-  const token = jwt.sign({ email_id, user_type }, process.env.JWT_PRIVATE_KEY, { expiresIn: "1h" });
-  return token;
-};
 
 module.exports = User;

@@ -1,24 +1,19 @@
 const jwt = require("jsonwebtoken");
+const { decode_token } = require("../utility/token");
 
 module.exports = function (req, res, next) {
-  if (!process.env.DEV) {
-    const token = req.headers["x-access-token"] || req.headers["authorization"];
-    if (!token) return res.status(401).send("Access denied. No token provided.");
-    try {
-      const decoded = jwt.verify(token, process.env.JWT_PRIVATE_KEY);
+  const token = req.headers["x-access-token"] || req.headers["authorization"];
+  if (!token) return res.status(401).send("Access denied. No token provided.");
+  try {
+    decode_token(token, ({ email_id, user_type }) => {
       req.user = {
-        email_id: decoded.email_id,
-        user_type: decoded.user_type
+        email_id,
+        user_type
       }
-      next();
-    } catch (ex) {
-      res.status(400).send("Invalid token.");
-    }
-  } else {
-    req.user = {
-      email_id: "dummy@gmail.com",
-      user_type: "P"
-    }
+    });
     next();
+  } catch (ex) {
+    console.log(`Error in auth middleware: ${ex}`);
+    res.status(400).send("Invalid token.");
   }
 };

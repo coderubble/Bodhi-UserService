@@ -18,7 +18,7 @@ This Service is used to manage users of Bodhi application.
 ```
 ### input for authentication
 ```
-{"email_id": "trump@usa.com","password":"trump123"}
+{"email_id": "scott@usa.com","password":"scott123"}
 ```
 
 ## Docker
