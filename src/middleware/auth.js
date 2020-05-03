@@ -13,7 +13,7 @@ module.exports = function (req, res, next) {
     });
     next();
   } catch (ex) {
-    console.log(`Error in auth middleware: ${ex}`);
+    console.error(`Error in auth middleware: ${ex}`);
     res.status(400).send("Invalid token.");
   }
 };

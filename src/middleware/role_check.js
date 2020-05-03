@@ -18,7 +18,6 @@ const system = (req, res, next) => {
 
 const insert_usertype_check = (req, res, next) => {
   const insert_usertype = req.body.user_type;
-  console.log(`>>>${insert_usertype}`);  
   if (insert_usertype === PATIENT) {
     next();
   } else {
@@ -27,10 +26,10 @@ const insert_usertype_check = (req, res, next) => {
     try {
       decode_token(token, ({ user_type }) => {
         if (insert_usertype === CLINIC_USER) {
-          if (![CLINIC_ADMIN, SYSTEM_ADMIN].includes(user_type)) throw ({ message: "Not authenticated to insert Clinic User" });
+          if (![CLINIC_ADMIN, SYSTEM_ADMIN].includes(user_type)) throw (`Role ${user_type} not authorized to create CLINIC USER`);
         } else if (insert_usertype === CLINIC_ADMIN) {
-          if (user_type !== SYSTEM_ADMIN) throw ({ message: "Not authenticated to insert Clinic Admin" });
-        } else if (insert_usertype === 'S') {
+          if (user_type !== SYSTEM_ADMIN) throw (`Role ${user_type} not authorized to create CLINIC USER`);
+        } else if (insert_usertype === SYSTEM_ADMIN) {
           throw ({ message: "Cannot insert System Admin" });
         } else {
           throw ({ message: "Invalid User" });
@@ -39,8 +38,8 @@ const insert_usertype_check = (req, res, next) => {
       });
 
     } catch (ex) {
-      console.log(`Catch error:${JSON.stringify(ex)}`);
-      res.status(403).send(ex);
+      console.error(`Catch error:${JSON.stringify(ex)}`);
+      res.status(403).send({ message: "Not Authorised to preform this action" });
     }
   }
 };

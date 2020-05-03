@@ -7,14 +7,13 @@ const auth = require("../middleware/auth");
 const { decode_token } = require("../utility/token");
 const { clinic, system, insert_usertype_check } = require("../middleware/role_check");
 router.post("/login", (req, res) => {
-    userLogin(req.body, (error, result) => {
+  userLogin(req.body, (error, result) => {
     if (result) {
       res.setHeader("x-auth-token", result);
       res.send(result);
-    }
-    else {
-      console.log(`Login Error: ${JSON.stringify(error)}`);
-      res.status(500).send("Incorrect username or password");
+    } else {
+      console.error(`Login Error: ${JSON.stringify(error)}`);
+      res.status(500).send("Incorrect Username or Password");
     }
   });
 });
@@ -23,9 +22,8 @@ router.get("/", [auth, clinic], (req, res) => {
   userGetAll(req.query, (error, result) => {
     if (result) {
       res.send(result);
-    }
-    else {
-      console.log(`Error: ${JSON.stringify(error)}`);
+    } else {
+      console.error(`Error: ${JSON.stringify(error)}`);
       res.status(400).send({ message: error.errors });
     }
   });
@@ -35,9 +33,8 @@ router.get("/:email_id", auth, (req, res) => {
   userGetByEmail(req.params, (error, result) => {
     if (result) {
       res.send(result);
-    }
-    else {
-      console.log(`Error: ${JSON.stringify(error)}`);
+    } else {
+      console.error(`Error: ${JSON.stringify(error)}`);
       res.status(400).send({ message: error.errors });
     }
   })
@@ -49,17 +46,16 @@ router.post("/", insert_usertype_check, validate(), function (req, res) {
     res.status(400).send(`Validation errors: ${JSON.stringify(validationErrors.array())}`);
   } else {
     const token = req.headers["x-access-token"] || req.headers["authorization"];
+    let loggedInUser;
     if (token) {
-      decode_token(token, ({ email_id, user_type, clinic_id }) => {
-        req.body.clinic_id = clinic_id;
-      })
+      loggedInUser = decode_token(token)
     }
-    userInsert(req.body, (error, result) => {
+    userInsert(req.body, loggedInUser, (error, result) => {
       if (result) {
         res.status(201).send(result);
       }
       else {
-        console.log(`Error: ${JSON.stringify(error)}`);
+        console.error(`Error: ${JSON.stringify(error)}`);
         res.status(400).send({ message: error.errors });
       }
     });
@@ -79,7 +75,7 @@ router.put("/", [auth, clinic], validate(), (req, res) => {
         res.status(201).json(result);
       }
       else {
-        console.log(`Error: ${JSON.stringify(error)}`);
+        console.error(`Error: ${JSON.stringify(error)}`);
         res.status(400).send({ message: error.errors });
       }
     });
@@ -93,9 +89,8 @@ router.delete("/:email_id", [auth, system], (req, res) => {
   userDelete(req.params, (error, result) => {
     if (result) {
       res.sendStatus(200);
-    }
-    else {
-      console.log(`Error: ${JSON.stringify(error)}`);
+    } else {
+      console.error(`Error: ${JSON.stringify(error)}`);
       res.status(400).send({ message: error.errors });
     }
   });
