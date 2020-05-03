@@ -1,7 +1,8 @@
 const ClinicUser = require("../models/clinic_user.model");
 const User = require("../models/user.model");
-const { decode_token, generateAuthToken } = require("../utility/token");
+const { generateAuthToken } = require("../utility/token");
 const bcrypt = require("bcryptjs");
+const { sequelize } = require("../db/database");
 
 exports.userLogin = function ({ email_id, password }, callback) {
   User.findOne({
@@ -11,11 +12,10 @@ exports.userLogin = function ({ email_id, password }, callback) {
       //If passwords match,check user_type
       if (result) {
         //If user_type is Clinic Admin or Clinic User,get clinic_id from ClinicUser table and set it to user object
-        let user_clone = {email_id: user.email_id, user_type: user.user_type, clinic_id: null }
+        let user_clone = { email_id: user.email_id, user_type: user.user_type, clinic_id: null }
         if (user.user_type === 'A' || user.user_type === 'U') {
           await ClinicUser.findOne({ where: { user_id: email_id } }).then((clinic_user) => {
             user_clone.clinic_id = clinic_user.clinic_id;
-            console.log(`Clinic ID exists;Now User object:${JSON.stringify(user_clone)}`);
           })
         }
         callback(null, generateAuthToken(user_clone));
@@ -62,27 +62,28 @@ function maskedUser(users) {
 }
 
 exports.userInsert = function ({ email_id, user_type, first_name, last_name, dob, address, contact_no, password, clinic_id }, callback) {
-  let userData = { email_id, user_type, first_name, last_name, dob, address, contact_no, clinic_id };
-  var user;
-  bcrypt.hash(password, Number(process.env.SALT), function (err, hash) {
+  console.log(`>>>Insert User`);
+  
+  let user, userData = { email_id, user_type, first_name, last_name, dob, address, contact_no, clinic_id };
+  bcrypt.hash(password, Number(process.env.SALT), async function (err, hash) {
     if (hash) {
       userData.password = hash;
-      User.create(userData).then((user) => {
-        console.log(`>>>Clinic id:${clinic_id}`);
-
-        if (clinic_id) {
-          ClinicUser.create({
-            clinic_id,
-            user_id: email_id
-          })
+      let transaction = null;
+      try {
+        transaction = await sequelize().transaction();
+        let user = await User.create(userData, { transaction });
+        if (user_type !== 'P') {
+          await ClinicUser.create({ clinic_id, user_id: email_id }, { transaction });
         }
-      }).then(() => {
-        callback(null, { message: `Created Record: ${user.email_id}` });
-      }).catch((error) => {
+        await transaction.commit();
+        if (user) {
+          callback(null, { message: `Created Record: ${user.email_id}` });
+        }
+      } catch (error) {
+        await transaction.rollback();
         callback(error);
-      });
-    }
-    else {
+      }
+    } else {
       callback("Insert Failed");
     }
   });

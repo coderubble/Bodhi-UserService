@@ -12,13 +12,24 @@ This Service is used to manage users of Bodhi application.
         "last_name":"Trump",
         "user_type": "S",
         "contact_no": "+9198172398712",
-        "dob":"10-10-1950",
+        "dob":"1950-10-10",
+        "address":"White house, USA"
+    }
+    {
+        "email_id": "user@usa.com",   
+        "password":"user123",
+        "first_name":"User",
+        "last_name":"U",
+        "user_type": "U",
+        "contact_no": "+9198172398712",
+        "dob":"1950-10-10",
         "address":"White house, USA"
     }
 ```
 ### input for authentication
 ```
 {"email_id": "scott@usa.com","password":"scott123"}
+{"email_id": "trump@usa.com","password":"trump123"}
 ```
 
 ## Docker

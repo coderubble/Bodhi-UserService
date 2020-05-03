@@ -6,9 +6,8 @@ const { validate } = require("../middleware/validate");
 const auth = require("../middleware/auth");
 const { decode_token } = require("../utility/token");
 const { clinic, system, insert_usertype_check } = require("../middleware/role_check");
-router.post("/login", async (req, res) => {
-  console.log(`Inside login controller:${JSON.stringify(req.body)}`);
-  userLogin(req.body, (error, result) => {
+router.post("/login", (req, res) => {
+    userLogin(req.body, (error, result) => {
     if (result) {
       res.setHeader("x-auth-token", result);
       res.send(result);
@@ -52,7 +51,6 @@ router.post("/", insert_usertype_check, validate(), function (req, res) {
     const token = req.headers["x-access-token"] || req.headers["authorization"];
     if (token) {
       decode_token(token, ({ email_id, user_type, clinic_id }) => {
-        console.log(`>>>>controller:email_id:${email_id},usertype:${user_type},clinicid:${clinic_id}`);
         req.body.clinic_id = clinic_id;
       })
     }

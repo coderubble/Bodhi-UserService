@@ -1,5 +1,6 @@
 const jwt = require("jsonwebtoken");
 const { decode_token } = require("../utility/token");
+const { CLINIC_ADMIN, CLINIC_USER, SYSTEM_ADMIN, PATIENT } = require("../constants/constants");
 const clinic = (req, res, next) => {
   if (req.user.user_type === 'C' || req.user.user_type === 'S') {
     next();
@@ -17,17 +18,18 @@ const system = (req, res, next) => {
 
 const insert_usertype_check = (req, res, next) => {
   const insert_usertype = req.body.user_type;
-  if (insert_usertype === 'P') {
+  console.log(`>>>${insert_usertype}`);  
+  if (insert_usertype === PATIENT) {
     next();
   } else {
     const token = req.headers["x-access-token"] || req.headers["authorization"];
     if (!token) return res.status(401).send("Access denied. No token provided.");
     try {
       decode_token(token, ({ user_type }) => {
-        if (insert_usertype === 'U') {
-          if (!['A', 'S'].includes(user_type)) throw ({ message: "Not authenticated to insert Clinic User" });
-        } else if (insert_usertype === 'A') {
-          if (!user_type === 'S') throw ({ message: "Not authenticated to insert Clinic User" });
+        if (insert_usertype === CLINIC_USER) {
+          if (![CLINIC_ADMIN, SYSTEM_ADMIN].includes(user_type)) throw ({ message: "Not authenticated to insert Clinic User" });
+        } else if (insert_usertype === CLINIC_ADMIN) {
+          if (user_type !== SYSTEM_ADMIN) throw ({ message: "Not authenticated to insert Clinic Admin" });
         } else if (insert_usertype === 'S') {
           throw ({ message: "Cannot insert System Admin" });
         } else {
