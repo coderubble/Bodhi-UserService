@@ -38,7 +38,7 @@ const insert_usertype_check = (req, res, next) => {
       });
 
     } catch (ex) {
-      console.error(`Catch error:${JSON.stringify(ex)}`);
+      console.log(`Catch error:${JSON.stringify(ex)}`);
       res.status(403).send({ message: "Not Authorised to preform this action" });
     }
   }
