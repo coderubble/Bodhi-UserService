@@ -114,6 +114,7 @@ describe("System Admin Flow", () => {
           .set("authorization", token)
           .send(clinicAdmin);
         expect(clinic_admin_response.statusCode).toEqual(201);
+        expect(clinic_admin_response.clinic_id).toEqual('1234567');
 
         const clinic_user_response = await request(app)
           .post("/user")
@@ -128,4 +129,9 @@ describe("System Admin Flow", () => {
         console.log(JSON.stringify(users));
       }).then(() => done());
   });
+
+
+
+
+
 });

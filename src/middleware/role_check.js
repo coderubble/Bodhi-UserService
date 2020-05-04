@@ -2,14 +2,14 @@ const jwt = require("jsonwebtoken");
 const { decode_token } = require("../utility/token");
 const { CLINIC_ADMIN, CLINIC_USER, SYSTEM_ADMIN, PATIENT } = require("../constants/constants");
 const clinic = (req, res, next) => {
-  if (req.user.user_type === 'C' || req.user.user_type === 'S') {
+  if (req.user.user_type === CLINIC_ADMIN || req.user.user_type === SYSTEM_ADMIN) {
     next();
   } else {
     res.sendStatus(401)
   }
 }
 const system = (req, res, next) => {
-  if (req.user.user_type === 'S') {
+  if (req.user.user_type === SYSTEM_ADMIN) {
     next();
   } else {
     res.sendStatus(401)
@@ -26,9 +26,9 @@ const insert_usertype_check = (req, res, next) => {
     try {
       decode_token(token, ({ user_type }) => {
         if (insert_usertype === CLINIC_USER) {
-          if (![CLINIC_ADMIN, SYSTEM_ADMIN].includes(user_type)) throw (`Role ${user_type} not authorized to create CLINIC USER`);
+          if (user_type !== CLINIC_ADMIN) throw (`Role ${user_type} not authorized to create CLINIC USER`);
         } else if (insert_usertype === CLINIC_ADMIN) {
-          if (user_type !== SYSTEM_ADMIN) throw (`Role ${user_type} not authorized to create CLINIC USER`);
+          if (user_type !== SYSTEM_ADMIN) throw (`Role ${user_type} not authorized to create CLINIC ADMIN`);
         } else if (insert_usertype === SYSTEM_ADMIN) {
           throw ({ message: "Cannot insert System Admin" });
         } else {
@@ -39,7 +39,7 @@ const insert_usertype_check = (req, res, next) => {
 
     } catch (ex) {
       console.log(`Catch error:${JSON.stringify(ex)}`);
-      res.status(403).send({ message: "Not Authorised to preform this action" });
+      res.status(403).send({ message: "Not Authorised to perform this action" });
     }
   }
 };

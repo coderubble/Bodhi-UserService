@@ -12,7 +12,7 @@ module.exports.sequelize = function () {
         {
           host: enviroment.POSTGRES_HOST,
           dialect: "postgres",
-          logging: false,
+         // logging: false,
           define: {
             timestamps: false
           }

@@ -16,10 +16,32 @@ This Service is used to manage users of Bodhi application.
         "address":"White house, USA"
     }
     {
-        "email_id": "user@usa.com",   
-        "password":"user123",
+        "email_id": "Admin@usa.com",   
+        "password":"a123",
+        "first_name":"Clinic",
+        "last_name":"Admin",
+        "user_type": "A",
+        "contact_no": "+9198172398712",
+        "dob":"1950-10-10",
+        "address":"White house, USA",
+        "clinic_id":"5eab42762d4e1b4db8fd6a8c"
+    }
+    {
+        "email_id": "user1@usa.com",   
+        "password":"u1123",
         "first_name":"User",
-        "last_name":"U",
+        "last_name":"1",
+        "user_type": "U",
+        "contact_no": "+9198172398712",
+        "dob":"1950-10-10",
+        "address":"White house, USA",
+        "clinic_id":"5eab42762d4e1b4db8fd6a8c"
+    }
+    {
+        "email_id": "user2@usa.com",   
+        "password":"u2123",
+        "first_name":"User",
+        "last_name":"2",
         "user_type": "U",
         "contact_no": "+9198172398712",
         "dob":"1950-10-10",

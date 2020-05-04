@@ -14,7 +14,7 @@ const User = sequelize().define("users", {
 }, {
   classMethods: {
     associate: function (models) {
-      User.hasOne(ClinicUser, { foreignKey: 'user_id', sourceKey: 'email_id' });
+      User.hasOne(ClinicUser, { foreignKey: 'email_id', sourceKey: 'email_id' });
     }
   }
 });
