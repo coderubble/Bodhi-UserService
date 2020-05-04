@@ -6,12 +6,9 @@ const { sequelize } = require("../db/database");
 const { CLINIC_ADMIN, CLINIC_USER, SYSTEM_ADMIN } = require("../constants/constants")
 
 exports.userLogin = function ({ email_id, password }, callback) {
-  console.log(`>>>>>>>>>>>>>>>>>>${email_id}<<<<<<<<<<${password}`);
-  
   User.findOne({
     where: { email_id }
   }).then((user) => {
-    console.log(`<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<${JSON.stringify(user)}`);
     bcrypt.compare(password, user.password, async function (error, result) {
       //If passwords match,check user_type
       if (result) {
