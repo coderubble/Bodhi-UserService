@@ -5,10 +5,11 @@ module.exports = function (req, res, next) {
   const token = req.headers["x-access-token"] || req.headers["authorization"];
   if (!token) return res.status(401).send("Access denied. No token provided.");
   try {
-    decode_token(token, ({ email_id, user_type }) => {
+    decode_token(token, ({ email_id, user_type,clinic_id }) => {
       req.user = {
         email_id,
-        user_type
+        user_type,
+        clinic_id
       }
     });
     next();

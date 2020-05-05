@@ -4,7 +4,7 @@ const sinon = require("sinon");
 const { Sequelize } = require("sequelize");
 sinon.stub(db, "sequelize").returns(new Sequelize('sqlite::memory:'));
 const app = require("../src/app"); // This line must be after the sequalize stub creation.
-const { CLINIC_ADMIN, CLINIC_USER, SYSTEM_ADMIN, PATIENT } = require("../src/constants/constants");
+const { PATIENT } = require("../src/constants/constants");
 const bcrypt = require("bcryptjs");
 const User = require("../src/models/user.model");
 const patient = {
@@ -32,6 +32,14 @@ describe("Patient Flow", () => {
     await server.close();
   });
 
+  test("Login Failure::User not found", async () => {
+    const res = await request(app)
+      .post("/user/login")
+      .send({ "email_id": patient.email_id, "password": patient.password });
+    expect(res.statusCode).toEqual(500);
+    expect(res.text).toEqual("User not found");
+  });
+
   test("Create Patient", async () => {
     const res = await request(app)
       .post("/user")
@@ -39,7 +47,7 @@ describe("Patient Flow", () => {
     expect(res.statusCode).toEqual(201);
   });
 
-  test("Login Success", async () => {
+   test("Login Success", async () => {
     const res = await request(app)
       .post("/user/login")
       .send({ "email_id": patient.email_id, "password": patient.password });

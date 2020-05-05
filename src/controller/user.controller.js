@@ -12,14 +12,14 @@ router.post("/login", (req, res) => {
       res.setHeader("x-auth-token", result);
       res.send(result);
     } else {
-      console.error(`Login Error: ${JSON.stringify(error)}`);
-      res.status(500).send("Incorrect Username or Password");
+      console.log(`Login Error: ${JSON.stringify(error)}`);
+      res.status(500).send(error);
     }
   });
 });
 
 router.get("/", [auth, clinic], (req, res) => {
-  userGetAll(req.query, (error, result) => {
+  userGetAll(req.query, req.user, (error, result) => {
     if (result) {
       res.send(result);
     } else {

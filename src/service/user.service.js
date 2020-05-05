@@ -9,7 +9,9 @@ exports.userLogin = function ({ email_id, password }, callback) {
   User.findOne({
     where: { email_id }
   }).then((user) => {
+    console.log(`Userlogin:${JSON.stringify(user)}>>>>>${password}`);
     bcrypt.compare(password, user.password, async function (error, result) {
+      if (error) throw new Error('Incorrect Username or Password');
       //If passwords match,check user_type
       if (result) {
         //If user_type is Clinic Admin or Clinic User,get clinic_id from ClinicUser table and set it to user object
@@ -21,42 +23,59 @@ exports.userLogin = function ({ email_id, password }, callback) {
         }
         callback(null, generateAuthToken(user_clone));
       } else {
-        console.error(`bcrypt Error: ${error}`)
         callback("Incorrect Username or Password");
       }
     });
   }).catch((error) => {
-    console.error(`Error: ${error}`);
+    console.log(`Catch Login Error: ${error}`);
     callback("User not found");
   });
 };
 
-exports.userGetAll = async function ({ from, to }, callback) {
+exports.userGetAll = function ({ from, to }, { user_type, clinic_id }, callback) {
   const to_record = to || 1;
   const offset = from || 0;
   const limit = Math.min(25, to_record - offset);
   const seq = sequelize();
-  const records = await seq.query(`select u.email_id, '*****' as password, first_name, last_name, dob, user_type,address, contact_no,c.clinic_id 
-  from users u left outer join clinic_users c on u.email_id = c.email_id limit ${limit} offset ${offset} `,
-    {
-      type: User.SELECT
-    });
-  console.log(`%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%${JSON.stringify(records[0], null, 3)}`);
-  callback(null, records[0]);
-  // User.findAndCountAll({
-  //   include: [
-  //     { model: ClinicUser }
-  //   ],
-  //   limit,
-  //   offset,
-  //   order: [["email_id", "ASC"]]
-  // }, { plain: true },
-  // ).then((users) => {
-  //   callback(null, maskedUser(users.rows));
-  // }).catch((error) => {
-  //   console.error(`Error: ${error}`);
-  //   callback(error);
-  // });
+
+  const select_left = `select u.email_id, first_name, last_name, dob, user_type,address, contact_no,c.clinic_id from users u
+   left outer join	clinic_users c on u.email_id = c.email_id`;
+  const where = ` where u.user_type='U' and c.clinic_id='${clinic_id}'`;
+  const count = ` limit ${limit}  offset ${offset}`;
+  let select_query;
+  if (user_type === 'S') {
+    select_query = select_left + count;
+  } else if (user_type === 'A') {
+    select_query = select_left + where + count;
+  } else {
+    console.log('Not authorised');
+  }
+  seq.query(select_query, {
+    type: User.SELECT
+  }).then((records) => {
+    callback(null, records[0]);
+  }).catch((err) => {
+    callback(err);
+  })
+
+
+
+  // if (user_type === 'A') {
+  //   const records = await seq.query(`select u.email_id, first_name, last_name, dob, user_type,address, contact_no,c.clinic_id from users u
+  // left outer join	clinic_users c on u.email_id = c.email_id	where u.user_type='U' and c.clinic_id=${clinic_id} limit ${limit} offset ${offset} `,
+  //     {
+  //       type: User.SELECT
+  //     });
+  //   callback(null, records[0]);
+
+  // } else if (user_type === 'S') {
+  //   const records = await seq.query(`select u.email_id, first_name, last_name, dob, user_type,address, contact_no,c.clinic_id 
+  // from users u left outer join clinic_users c on u.email_id = c.email_id limit ${limit} offset ${offset} `,
+  //     {
+  //       type: User.SELECT
+  //     });
+  //   callback(null, records[0]);
+  // }
 };
 
 exports.userGetByEmail = function ({ email_id }, callback) {
@@ -131,3 +150,19 @@ exports.userDelete = function ({ email_id }, callback) {
     callback(error);
   });
 };
+
+//Get all 
+// User.findAndCountAll({
+  //   include: [
+  //     { model: ClinicUser }
+  //   ],
+  //   limit,
+  //   offset,
+  //   order: [["email_id", "ASC"]]
+  // }, { plain: true },
+  // ).then((users) => {
+  //   callback(null, maskedUser(users.rows));
+  // }).catch((error) => {
+  //   console.error(`Error: ${error}`);
+  //   callback(error);
+  // });

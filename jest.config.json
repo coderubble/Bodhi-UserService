@@ -1,3 +1,3 @@
 {
-  "testRegex": "((\\.|/*.)(spec))\\.js?$"
+  "testRegex": "((\\.|/*.)(clinic_admin.spec))\\.js?$"
 }

@@ -8,6 +8,7 @@ const app = require("../src/app"); // This line must be after the sequalize stub
 const { CLINIC_ADMIN, CLINIC_USER, SYSTEM_ADMIN, PATIENT } = require("../src/constants/constants");
 const bcrypt = require("bcryptjs");
 const User = require("../src/models/user.model");
+
 const systemAdmin = {
   email_id: "system_admin@bodhi.com",
   password: "sysAdmin123",
@@ -40,6 +41,28 @@ const clinicUser = {
   dob: "1950-10-10",
   address: "White house, USA"
 }
+const clinicUser1 = {
+  email_id: "clinic_user1@bodhi.com",
+  password: "C1",
+  first_name: "U1",
+  last_name: "Trump",
+  clinic_id: "1234567",
+  user_type: CLINIC_USER,
+  contact_no: "+9198172398712",
+  dob: "1950-10-10",
+  address: "White house, USA"
+}
+const clinicUser2 = {
+  email_id: "clinic_user2@bodhi.com",
+  password: "C2",
+  first_name: "U2",
+  last_name: "Trump",
+  clinic_id: "1234567",
+  user_type: CLINIC_USER,
+  contact_no: "+9198172398712",
+  dob: "1950-10-10",
+  address: "White house, USA"
+}
 const patient = {
   email_id: "patient@bodhi.com",
   password: "trump123",
@@ -50,7 +73,7 @@ const patient = {
   dob: "1950-10-10",
   address: "White house, USA"
 }
-describe("System Admin Flow", () => {
+describe("Clinic Admin Flow", () => {
   let server;
   beforeAll((done) => {
     User.sync().then(() => {
@@ -72,22 +95,7 @@ describe("System Admin Flow", () => {
     await sequalize.close();
   });
 
-  test("Login Successfully", async () => {
-    const res = await request(app)
-      .post("/user/login")
-      .send({ email_id: systemAdmin.email_id, password: systemAdmin.password });
-    expect(res.statusCode).toEqual(200);
-  });
-
-  test("Login Failure", async () => {
-    const res = await request(app)
-      .post("/user/login")
-      .send({ email_id: systemAdmin.email_id, password: "wrongpassword" });
-    expect(res.text).toEqual("Incorrect Username or Password");
-    expect(res.statusCode).toEqual(500);
-  });
-
-  test("Create Patient & Clinic Admin by  System Admin", async () => {
+  test("System Admin Login & Create Clinic Admin", async () => {
     await request(app)
       .post("/user/login")
       .send({ email_id: systemAdmin.email_id, password: systemAdmin.password })
@@ -98,6 +106,40 @@ describe("System Admin Flow", () => {
           .set("authorization", token)
           .send(clinicAdmin);
         expect(clinic_admin_response.statusCode).toEqual(201);
+      });
+  });
+
+  test("Login Failure", async () => {
+    const res = await request(app)
+      .post("/user/login")
+      .send({ email_id: clinicAdmin.email_id, password: "wrongpassword" });
+    expect(res.text).toEqual("Incorrect Username or Password");
+    expect(res.statusCode).toEqual(500);
+  });
+
+  test("Login as Clinic Admin,Can Create Clinic User & Patient::Not authorised to create Clinic Admin", async () => {
+    //Login as Clinic Admin & creater 3 Clinic Users and One Patient
+    await request(app).post("/user/login")
+      .send({ email_id: clinicAdmin.email_id, password: clinicAdmin.password })
+      .then(async (response) => {
+        const token = response.text;
+        const clinic_user_response = await request(app)
+          .post("/user")
+          .set("authorization", token)
+          .send(clinicUser);
+        expect(clinic_user_response.statusCode).toEqual(201);
+
+        const clinic_user1_response = await request(app)
+          .post("/user")
+          .set("authorization", token)
+          .send(clinicUser1);
+        expect(clinic_user1_response.statusCode).toEqual(201);
+
+        const clinic_user2_response = await request(app)
+          .post("/user")
+          .set("authorization", token)
+          .send(clinicUser2);
+        expect(clinic_user2_response.statusCode).toEqual(201);
 
         const patient_response = await request(app)
           .post("/user")
@@ -105,23 +147,23 @@ describe("System Admin Flow", () => {
           .send(patient);
         expect(patient_response.statusCode).toEqual(201);
 
-        const clinic_user_response = await request(app)
+        //Failed to create Clinic Admin 
+        const clinic_admin_response = await request(app)
           .post("/user")
           .set("authorization", token)
-          .send(clinicUser);
-        expect(clinic_user_response.statusCode).toEqual(403);
-        expect(JSON.parse(clinic_user_response.text).message).toEqual("Not Authorised to perform this action");
+          .send(clinicAdmin);
+        expect(clinic_admin_response.statusCode).toEqual(403);
 
-        const get_all_user_response = await request(app)
+        //Get all users in the clinic
+        const getall_response = await request(app)
           .get("/user?from=0&to=20")
           .set("authorization", token);
-        const users = JSON.parse(get_all_user_response.text)
+        const users = JSON.parse(getall_response.text) || []
+        console.log(`>>>>>${JSON.stringify(users)}`);
         result = users.map(user => {
           return user.email_id;
         })
-        expect(result).toEqual(expect.arrayContaining([systemAdmin.email_id, clinicAdmin.email_id, patient.email_id]));
-      });
-  });
-  // TODO: scenarios to write tests for:
-  // 
+        expect(result).toEqual(expect.not.arrayContaining([systemAdmin.email_id, patient.email_id, clinicAdmin.email_id]));
+      })
+  })
 });
