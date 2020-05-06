@@ -19,6 +19,16 @@ const systemAdmin = {
   dob: "1950-10-10",
   address: "White house, Australia"
 };
+const systemAdmin_updated = {
+  email_id: "system_admin@bodhi.com",
+  password: "sysAdmin123",
+  first_name: "Steven",
+  last_name: "Anderson",
+  user_type: SYSTEM_ADMIN,
+  contact_no: "+9198172398712",
+  dob: "1950-10-10",
+  address: "White house, Australia"
+};
 const clinicAdmin = {
   email_id: "clinic_admin@bodhi.com",
   password: "clinicAdmin123",
@@ -30,10 +40,32 @@ const clinicAdmin = {
   dob: "1950-10-10",
   address: "White house, USA"
 }
+const clinicAdminUpdate = {
+  email_id: "clinic_admin@bodhi.com",
+  password: "clinicAdmin123",
+  first_name: "Charly",
+  last_name: "Ambrose",
+  user_type: CLINIC_ADMIN,
+  clinic_id: "1234567",
+  contact_no: "+9198172398712",
+  dob: "1950-10-10",
+  address: "White house, USA"
+}
 const clinicUser = {
   email_id: "clinic_user@bodhi.com",
   password: "C",
   first_name: "U",
+  last_name: "Trump",
+  clinic_id: "1234567",
+  user_type: CLINIC_USER,
+  contact_no: "+9198172398712",
+  dob: "1950-10-10",
+  address: "White house, USA"
+}
+const clinicUserUpdate = {
+  email_id: "clinic_user@bodhi.com",
+  password: "C",
+  first_name: "User",
   last_name: "Trump",
   clinic_id: "1234567",
   user_type: CLINIC_USER,
@@ -68,6 +100,16 @@ const patient = {
   password: "trump123",
   first_name: "Donald",
   last_name: "Trump",
+  user_type: PATIENT,
+  contact_no: "+9198172398712",
+  dob: "1950-10-10",
+  address: "White house, USA"
+}
+const patientUpdated = {
+  email_id: "patient@bodhi.com",
+  password: "trump123",
+  first_name: "Donald",
+  last_name: "Davis",
   user_type: PATIENT,
   contact_no: "+9198172398712",
   dob: "1950-10-10",
@@ -118,7 +160,7 @@ describe("Clinic Admin Flow", () => {
   });
 
   test("Login as Clinic Admin,Can Create Clinic User & Patient::Not authorised to create Clinic Admin", async () => {
-    //Login as Clinic Admin & creater 3 Clinic Users and One Patient
+    //Login as Clinic Admin & created 3 Clinic Users and One Patient
     await request(app).post("/user/login")
       .send({ email_id: clinicAdmin.email_id, password: clinicAdmin.password })
       .then(async (response) => {
@@ -153,6 +195,25 @@ describe("Clinic Admin Flow", () => {
           .set("authorization", token)
           .send(clinicAdmin);
         expect(clinic_admin_response.statusCode).toEqual(403);
+
+        //Failed to update System Admin,Clinic User,Patient
+        const update_response = await request(app)
+          .put("/user")
+          .set("authorization", token)
+          .send(systemAdmin_updated);
+        expect(update_response.statusCode).toEqual(403);
+
+        const update_clinicuser_response = await request(app)
+          .put("/user")
+          .set("authorization", token)
+          .send(clinicUserUpdate);
+        expect(update_clinicuser_response.statusCode).toEqual(403);
+
+        const update_patient_response = await request(app)
+          .put("/user")
+          .set("authorization", token)
+          .send(patientUpdated);
+        expect(update_patient_response.statusCode).toEqual(403);
 
         //Get all users in the clinic
         const getall_response = await request(app)

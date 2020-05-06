@@ -1,10 +1,11 @@
 {
-  "name": "BodhiUserService",
+  "name": "bodhi_user_service",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
     "test": "env-cmd -f config/test.env jest --config ./jest.config.json --coverage",
+    "td": "env-cmd -f config/test.env node --inspect-brk ./node_modules/jest/bin/jest.js --runInBand test/system_admin.spec.js",
     "lint": "eslint src/**/*.js",
     "dev": "env-cmd -f config/dev.env nodemon src/app.js",
     "debug": "node --inspect-brk src/app.js",

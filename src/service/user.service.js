@@ -43,39 +43,25 @@ exports.userGetAll = function ({ from, to }, { user_type, clinic_id }, callback)
   const where = ` where u.user_type='U' and c.clinic_id='${clinic_id}'`;
   const count = ` limit ${limit}  offset ${offset}`;
   let select_query;
-  if (user_type === 'S') {
-    select_query = select_left + count;
-  } else if (user_type === 'A') {
-    select_query = select_left + where + count;
-  } else {
-    console.log('Not authorised');
+  try {
+    if (user_type === 'S') {
+      select_query = select_left + count;
+    } else if (user_type === 'A') {
+      select_query = select_left + where + count;
+    } else {
+      throw new Error('Not authorised');
+    }
+    seq.query(select_query, {
+      type: User.SELECT
+    }).then((records) => {
+      callback(null, records[0]);
+    }).catch((err) => {
+      callback(err);
+    })
   }
-  seq.query(select_query, {
-    type: User.SELECT
-  }).then((records) => {
-    callback(null, records[0]);
-  }).catch((err) => {
-    callback(err);
-  })
-
-
-
-  // if (user_type === 'A') {
-  //   const records = await seq.query(`select u.email_id, first_name, last_name, dob, user_type,address, contact_no,c.clinic_id from users u
-  // left outer join	clinic_users c on u.email_id = c.email_id	where u.user_type='U' and c.clinic_id=${clinic_id} limit ${limit} offset ${offset} `,
-  //     {
-  //       type: User.SELECT
-  //     });
-  //   callback(null, records[0]);
-
-  // } else if (user_type === 'S') {
-  //   const records = await seq.query(`select u.email_id, first_name, last_name, dob, user_type,address, contact_no,c.clinic_id 
-  // from users u left outer join clinic_users c on u.email_id = c.email_id limit ${limit} offset ${offset} `,
-  //     {
-  //       type: User.SELECT
-  //     });
-  //   callback(null, records[0]);
-  // }
+  catch (err) {
+    callback(err)
+  }
 };
 
 exports.userGetByEmail = function ({ email_id }, callback) {
@@ -103,6 +89,7 @@ exports.userInsert = function (userData, loggedInUser, callback) {
       try {
         transaction = await sequelize().transaction();
         const user = await User.create({ ...userData, password: hash }, { transaction });
+        console.log(`Created user:${JSON.stringify(user)}`);
         if (userData.user_type !== PATIENT) {
           let { clinic_id, user_type } = loggedInUser;
           if (user_type === SYSTEM_ADMIN) {
@@ -150,19 +137,3 @@ exports.userDelete = function ({ email_id }, callback) {
     callback(error);
   });
 };
-
-//Get all 
-// User.findAndCountAll({
-  //   include: [
-  //     { model: ClinicUser }
-  //   ],
-  //   limit,
-  //   offset,
-  //   order: [["email_id", "ASC"]]
-  // }, { plain: true },
-  // ).then((users) => {
-  //   callback(null, maskedUser(users.rows));
-  // }).catch((error) => {
-  //   console.error(`Error: ${error}`);
-  //   callback(error);
-  // });

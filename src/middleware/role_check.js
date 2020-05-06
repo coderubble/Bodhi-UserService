@@ -16,7 +16,7 @@ const system = (req, res, next) => {
   }
 }
 
-const insert_usertype_check = (req, res, next) => {
+const insertUser = (req, res, next) => {
   const insert_usertype = req.body.user_type;
   if (insert_usertype === PATIENT) {
     next();
@@ -26,7 +26,7 @@ const insert_usertype_check = (req, res, next) => {
     try {
       decode_token(token, ({ user_type }) => {
         if (insert_usertype === CLINIC_USER) {
-          if (user_type !== CLINIC_ADMIN) throw (`Role ${user_type} not authorized to create CLINIC USER`);
+          if (![CLINIC_ADMIN, SYSTEM_ADMIN].includes(user_type)) throw (`Role ${user_type} not authorized to create CLINIC USER`);
         } else if (insert_usertype === CLINIC_ADMIN) {
           if (user_type !== SYSTEM_ADMIN) throw (`Role ${user_type} not authorized to create CLINIC ADMIN`);
         } else if (insert_usertype === SYSTEM_ADMIN) {
@@ -43,4 +43,24 @@ const insert_usertype_check = (req, res, next) => {
     }
   }
 };
-module.exports = { clinic, system, insert_usertype_check };
+
+const updateUser = (req, res, next) => {
+  const loginUserEmailid = req.user.email_id;
+  const token = req.headers["x-access-token"] || req.headers["authorization"];
+  try {
+    decode_token(token, ({ user_type }) => {
+      console.log(`login user:${JSON.stringify(user_type)}`);
+      if (user_type !== SYSTEM_ADMIN) {
+        if (loginUserEmailid != req.body.email_id) {
+          throw (`Role ${user_type} not authorised to update this User`);
+        }
+      }
+      next();
+    });
+  }
+  catch (ex) {
+    console.log(`Catch error:${JSON.stringify(ex)}`);
+    res.status(403).send({ message: "Not Authorised to perform this action" });
+  }
+};
+module.exports = { clinic, system, insertUser, updateUser };

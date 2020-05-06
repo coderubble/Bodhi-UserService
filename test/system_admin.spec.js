@@ -18,6 +18,16 @@ const systemAdmin = {
   dob: "1950-10-10",
   address: "White house, Australia"
 };
+const systemAdmin_updated = {
+  email_id: "system_admin@bodhi.com",
+  password: "sysAdmin123",
+  first_name: "Steven",
+  last_name: "Anderson",
+  user_type: SYSTEM_ADMIN,
+  contact_no: "+9198172398712",
+  dob: "1950-10-10",
+  address: "White house, Australia"
+};
 const clinicAdmin = {
   email_id: "clinic_admin@bodhi.com",
   password: "clinicAdmin123",
@@ -29,11 +39,33 @@ const clinicAdmin = {
   dob: "1950-10-10",
   address: "White house, USA"
 }
+const clinicAdmin_updated = {
+  email_id: "clinic_admin@bodhi.com",
+  password: "clinicAdmin123",
+  first_name: "Charly",
+  last_name: "Ambrose",
+  user_type: CLINIC_ADMIN,
+  clinic_id: "1234567",
+  contact_no: "+9198172398712",
+  dob: "1950-10-10",
+  address: "White house, USA"
+}
 const clinicUser = {
   email_id: "clinic_user@bodhi.com",
-  password: "C",
+  password: "c123",
   first_name: "U",
   last_name: "Trump",
+  clinic_id: "1234567",
+  user_type: CLINIC_USER,
+  contact_no: "+9198172398712",
+  dob: "1950-10-10",
+  address: "White house, USA"
+}
+const clinicUser_updated = {
+  email_id: "clinic_user@bodhi.com",
+  password: "C",
+  first_name: "User",
+  last_name: "U",
   clinic_id: "1234567",
   user_type: CLINIC_USER,
   contact_no: "+9198172398712",
@@ -45,6 +77,16 @@ const patient = {
   password: "trump123",
   first_name: "Donald",
   last_name: "Trump",
+  user_type: PATIENT,
+  contact_no: "+9198172398712",
+  dob: "1950-10-10",
+  address: "White house, USA"
+}
+const patientUpdated = {
+  email_id: "patient@bodhi.com",
+  password: "trump123",
+  first_name: "Donald",
+  last_name: "Davis",
   user_type: PATIENT,
   contact_no: "+9198172398712",
   dob: "1950-10-10",
@@ -87,7 +129,7 @@ describe("System Admin Flow", () => {
     expect(res.statusCode).toEqual(500);
   });
 
-  test("Create Patient & Clinic Admin by  System Admin", async () => {
+  test("Create Patient,Clinic Admin & Clinic User,Also Update the same by  System Admin", async () => {
     await request(app)
       .post("/user/login")
       .send({ email_id: systemAdmin.email_id, password: systemAdmin.password })
@@ -109,9 +151,33 @@ describe("System Admin Flow", () => {
           .post("/user")
           .set("authorization", token)
           .send(clinicUser);
-        expect(clinic_user_response.statusCode).toEqual(403);
-        expect(JSON.parse(clinic_user_response.text).message).toEqual("Not Authorised to perform this action");
+        expect(clinic_user_response.statusCode).toEqual(201);
 
+        const update_response = await request(app)
+          .put("/user")
+          .set("authorization", token)
+          .send(systemAdmin_updated);
+        expect(update_response.statusCode).toEqual(201);
+
+        const update_clinicadmin_response = await request(app)
+          .put("/user")
+          .set("authorization", token)
+          .send(clinicAdmin_updated);
+        expect(update_clinicadmin_response.statusCode).toEqual(201);
+
+        const update_clinicuser_response = await request(app)
+          .put("/user")
+          .set("authorization", token)
+          .send(clinicUser_updated);
+        expect(update_clinicuser_response.statusCode).toEqual(201);
+
+        const update_patient_response = await request(app)
+          .put("/user")
+          .set("authorization", token)
+          .send(patientUpdated);
+          console.log(`>>>${JSON.stringify(update_patient_response)}`);
+        expect(update_patient_response.statusCode).toEqual(201);
+      
         const get_all_user_response = await request(app)
           .get("/user?from=0&to=20")
           .set("authorization", token);
@@ -119,7 +185,10 @@ describe("System Admin Flow", () => {
         result = users.map(user => {
           return user.email_id;
         })
+        console.log(`Result:${JSON.stringify(users)}`);
+
         expect(result).toEqual(expect.arrayContaining([systemAdmin.email_id, clinicAdmin.email_id, patient.email_id]));
+
       });
   });
   // TODO: scenarios to write tests for:

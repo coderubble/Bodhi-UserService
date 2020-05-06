@@ -5,7 +5,7 @@ const { validationResult } = require("express-validator");
 const { validate } = require("../middleware/validate");
 const auth = require("../middleware/auth");
 const { decode_token } = require("../utility/token");
-const { clinic, system, insert_usertype_check } = require("../middleware/role_check");
+const { clinic, system, insertUser, updateUser } = require("../middleware/role_check");
 router.post("/login", (req, res) => {
   userLogin(req.body, (error, result) => {
     if (result) {
@@ -40,7 +40,7 @@ router.get("/:email_id", auth, (req, res) => {
   })
 });
 
-router.post("/", insert_usertype_check, validate(), function (req, res) {
+router.post("/", insertUser, validate(), function (req, res) {
   const validationErrors = validationResult(req);
   if (!validationErrors.isEmpty()) {
     res.status(400).send(`Validation errors: ${JSON.stringify(validationErrors.array())}`);
@@ -62,13 +62,10 @@ router.post("/", insert_usertype_check, validate(), function (req, res) {
   }
 });
 
-router.put("/", [auth, clinic], validate(), (req, res) => {
-  const login_user = req.body.email_id;
+router.put("/", auth, updateUser, validate(), (req, res) => {
   const validationErrors = validationResult(req);
   if (!validationErrors.isEmpty()) {
     res.status(400).send(`Validation errors: ${JSON.stringify(validationErrors.array())}`);
-  } else if (login_user != req.body.email_id) {
-    res.status(401).send("Unauthorised to update this User");
   } else {
     userUpdate(req.body, (error, result) => {
       if (result) {
