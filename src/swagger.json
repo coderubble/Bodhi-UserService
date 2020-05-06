@@ -27,7 +27,7 @@
     }
   },
   "host": "localhost:3001",
-  "basePath": "/",
+  "basePath": "/api/v1",
   "tags": [
     {
       "name": "Users",

@@ -116,14 +116,14 @@ describe("System Admin Flow", () => {
 
   test("Login Successfully", async () => {
     const res = await request(app)
-      .post("/user/login")
+      .post(`${process.env.API_PREFIX}/user/login`)
       .send({ email_id: systemAdmin.email_id, password: systemAdmin.password });
     expect(res.statusCode).toEqual(200);
   });
 
   test("Login Failure", async () => {
     const res = await request(app)
-      .post("/user/login")
+      .post(`${process.env.API_PREFIX}/user/login`)
       .send({ email_id: systemAdmin.email_id, password: "wrongpassword" });
     expect(res.text).toEqual("Incorrect Username or Password");
     expect(res.statusCode).toEqual(500);
@@ -131,55 +131,54 @@ describe("System Admin Flow", () => {
 
   test("Create Patient,Clinic Admin & Clinic User,Also Update the same by  System Admin", async () => {
     await request(app)
-      .post("/user/login")
+      .post(`${process.env.API_PREFIX}/user/login`)
       .send({ email_id: systemAdmin.email_id, password: systemAdmin.password })
       .then(async (response) => {
         const token = response.text;
         const clinic_admin_response = await request(app)
-          .post("/user")
+          .post(`${process.env.API_PREFIX}/user`)
           .set("authorization", token)
           .send(clinicAdmin);
         expect(clinic_admin_response.statusCode).toEqual(201);
 
         const patient_response = await request(app)
-          .post("/user")
+          .post(`${process.env.API_PREFIX}/user`)
           .set("authorization", token)
           .send(patient);
         expect(patient_response.statusCode).toEqual(201);
 
         const clinic_user_response = await request(app)
-          .post("/user")
+          .post(`${process.env.API_PREFIX}/user`)
           .set("authorization", token)
           .send(clinicUser);
         expect(clinic_user_response.statusCode).toEqual(201);
 
         const update_response = await request(app)
-          .put("/user")
+          .put(`${process.env.API_PREFIX}/user`)
           .set("authorization", token)
           .send(systemAdmin_updated);
         expect(update_response.statusCode).toEqual(201);
 
         const update_clinicadmin_response = await request(app)
-          .put("/user")
+          .put(`${process.env.API_PREFIX}/user`)
           .set("authorization", token)
           .send(clinicAdmin_updated);
         expect(update_clinicadmin_response.statusCode).toEqual(201);
 
         const update_clinicuser_response = await request(app)
-          .put("/user")
+          .put(`${process.env.API_PREFIX}/user`)
           .set("authorization", token)
           .send(clinicUser_updated);
         expect(update_clinicuser_response.statusCode).toEqual(201);
 
         const update_patient_response = await request(app)
-          .put("/user")
+          .put(`${process.env.API_PREFIX}/user`)
           .set("authorization", token)
           .send(patientUpdated);
-          console.log(`>>>${JSON.stringify(update_patient_response)}`);
         expect(update_patient_response.statusCode).toEqual(201);
       
         const get_all_user_response = await request(app)
-          .get("/user?from=0&to=20")
+          .get(`${process.env.API_PREFIX}/user?from=0&to=20`)
           .set("authorization", token);
         const users = JSON.parse(get_all_user_response.text)
         result = users.map(user => {

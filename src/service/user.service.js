@@ -9,7 +9,7 @@ exports.userLogin = function ({ email_id, password }, callback) {
   User.findOne({
     where: { email_id }
   }).then((user) => {
-    console.log(`Userlogin:${JSON.stringify(user)}>>>>>${password}`);
+    console.log(`Userlogin:${email_id}>>>>>${password}`);
     bcrypt.compare(password, user.password, async function (error, result) {
       if (error) throw new Error('Incorrect Username or Password');
       //If passwords match,check user_type

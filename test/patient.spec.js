@@ -34,7 +34,7 @@ describe("Patient Flow", () => {
 
   test("Login Failure::User not found", async () => {
     const res = await request(app)
-      .post("/user/login")
+      .post(`${process.env.API_PREFIX}/user/login`)
       .send({ "email_id": patient.email_id, "password": patient.password });
     expect(res.statusCode).toEqual(500);
     expect(res.text).toEqual("User not found");
@@ -42,21 +42,21 @@ describe("Patient Flow", () => {
 
   test("Create Patient", async () => {
     const res = await request(app)
-      .post("/user")
+      .post(`${process.env.API_PREFIX}/user`)
       .send(patient);
     expect(res.statusCode).toEqual(201);
   });
 
    test("Login Success", async () => {
     const res = await request(app)
-      .post("/user/login")
+      .post(`${process.env.API_PREFIX}/user/login`)
       .send({ "email_id": patient.email_id, "password": patient.password });
     expect(res.statusCode).toEqual(200);
   });
   
   test("Login Failure", async (done) => {
     const res = await request(app)
-      .post("/user/login")
+      .post(`${process.env.API_PREFIX}/user/login`)
       .send({ email_id: patient.email_id, password: "wrongpassword" });
     expect(res.statusCode).toEqual(500);
     expect(res.text).toEqual("Incorrect Username or Password");
