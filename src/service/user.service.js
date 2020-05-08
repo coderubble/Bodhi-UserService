@@ -36,8 +36,6 @@ exports.userGetAll = function ({ from, to }, { user_type, clinic_id }, callback)
   const to_record = to || 1;
   const offset = from || 0;
   const limit = Math.min(25, to_record - offset);
-  const seq = sequelize();
-
   const select_left = `select u.email_id, first_name, last_name, dob, user_type,address, contact_no,c.clinic_id from users u
    left outer join	clinic_users c on u.email_id = c.email_id`;
   const where = ` where u.user_type='U' and c.clinic_id='${clinic_id}'`;
@@ -51,7 +49,7 @@ exports.userGetAll = function ({ from, to }, { user_type, clinic_id }, callback)
     } else {
       throw new Error('Not authorised');
     }
-    seq.query(select_query, {
+    sequelize.query(select_query, {
       type: User.SELECT
     }).then((records) => {
       callback(null, records[0]);

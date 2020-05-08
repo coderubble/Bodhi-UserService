@@ -1,13 +1,9 @@
 const request = require("supertest");
-const db = require("../src/db/database")
-const sinon = require("sinon");
-const { Sequelize } = require("sequelize");
-const sequalize = new Sequelize('sqlite::memory:');
-sinon.stub(db, "sequelize").returns(sequalize);
-const app = require("../src/app"); // This line must be after the sequalize stub creation.
+const models = require("../src/models")
+const app = require("../src/app");
 const { CLINIC_ADMIN, CLINIC_USER, SYSTEM_ADMIN, PATIENT } = require("../src/constants/constants");
 const bcrypt = require("bcryptjs");
-const User = require("../src/models/user.model");
+const User = models.user;
 
 const systemAdmin = {
   email_id: "system_admin@bodhi.com",
@@ -116,28 +112,18 @@ const patientUpdated = {
   address: "White house, USA"
 }
 describe("Clinic Admin Flow", () => {
-  let server;
-  beforeAll((done) => {
-    User.sync().then(() => {
-      server = app.listen(async () => {
-        global.agent = request.agent(server);
-        done();
-      });
-    }).then(() => {
-      bcrypt.hash(systemAdmin.password, Number(process.env.SALT), async function (err, hash) {
-        if (hash) {
-          User.create({ ...systemAdmin, password: hash });
-        }
-      });
-    })
+  beforeAll(async (done) => {
+    bcrypt.hash(systemAdmin.password, Number(process.env.SALT), async function (err, hash) {
+      User.create({ ...systemAdmin, password: hash }).then(() => { done() });
+    });
   });
 
   afterAll(async () => {
-    await server.close();
-    await sequalize.close();
+    await models.sequelize.close();
+    await app.close;
   });
 
-  test("System Admin Login & Create Clinic Admin", async () => {
+  it("System Admin Login & Create Clinic Admin", async () => {
     await request(app)
       .post(`${process.env.API_PREFIX}/user/login`)
       .send({ email_id: systemAdmin.email_id, password: systemAdmin.password })
@@ -151,7 +137,7 @@ describe("Clinic Admin Flow", () => {
       });
   });
 
-  test("Login Failure", async () => {
+  it("Login Failure", async () => {
     const res = await request(app)
       .post(`${process.env.API_PREFIX}/user/login`)
       .send({ email_id: clinicAdmin.email_id, password: "wrongpassword" });
@@ -159,7 +145,7 @@ describe("Clinic Admin Flow", () => {
     expect(res.statusCode).toEqual(500);
   });
 
-  test("Login as Clinic Admin,Can Create Clinic User & Patient::Not authorised to create Clinic Admin", async () => {
+  it("Login as Clinic Admin,Can Create Clinic User & Patient::Not authorised to create Clinic Admin", async () => {
     //Login as Clinic Admin & created 3 Clinic Users and One Patient
     await request(app).post(`${process.env.API_PREFIX}/user/login`)
       .send({ email_id: clinicAdmin.email_id, password: clinicAdmin.password })
@@ -225,5 +211,5 @@ describe("Clinic Admin Flow", () => {
         })
         expect(result).toEqual(expect.not.arrayContaining([systemAdmin.email_id, patient.email_id, clinicAdmin.email_id]));
       })
-  })
+  });
 });

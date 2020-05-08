@@ -11,9 +11,10 @@ app.use(express.json());
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument, { explorer: true }));
 app.use(process.env.API_PREFIX, routes);
 models.sequelize.sync().then(() => {
-  app.listen(PORT, function () {
-    console.log("Server is running at Port " + PORT);
-  });
+  if (process.env.NODE_ENV !== 'test') {
+    app.listen(PORT, function () {
+      console.log("Server is running at Port " + PORT);
+    });
+  }
 });
-console.log(`>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>${app}`)
 module.exports = app;

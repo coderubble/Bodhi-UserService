@@ -1,13 +1,9 @@
 const request = require("supertest");
-const db = require("../src/db/database")
-const sinon = require("sinon");
-const { Sequelize } = require("sequelize");
-const sequalize = new Sequelize('sqlite::memory:');
-sinon.stub(db, "sequelize").returns(sequalize);
-const app = require("../src/app"); // This line must be after the sequalize stub creation.
+const app = require("../src/app"); 
 const { CLINIC_ADMIN, CLINIC_USER, SYSTEM_ADMIN, PATIENT } = require("../src/constants/constants");
 const bcrypt = require("bcryptjs");
-const User = require("../src/models/user.model");
+const models = require("../src/models")
+const User = models.user
 const systemAdmin = {
   email_id: "system_admin@bodhi.com",
   password: "sysAdmin123",
@@ -94,24 +90,15 @@ const patientUpdated = {
 }
 describe("System Admin Flow", () => {
   let server;
-  beforeAll((done) => {
-    User.sync().then(() => {
-      server = app.listen(async () => {
-        global.agent = request.agent(server);
-        done();
-      });
-    }).then(() => {
-      bcrypt.hash(systemAdmin.password, Number(process.env.SALT), async function (err, hash) {
-        if (hash) {
-          User.create({ ...systemAdmin, password: hash });
-        }
-      });
-    })
+  beforeAll(async (done) => {
+    bcrypt.hash(systemAdmin.password, Number(process.env.SALT), async function (err, hash) {
+      User.create({ ...systemAdmin, password: hash }).then(() => { done() });
+    });
   });
 
   afterAll(async () => {
-    await server.close();
-    await sequalize.close();
+    await models.sequelize.close();
+    await app.close;
   });
 
   test("Login Successfully", async () => {
