@@ -42,7 +42,7 @@ This Service is used to manage users of Bodhi application.
         "password":"u2123",
         "first_name":"User",
         "last_name":"2",
-        "user_type": "U",
+        "user_type": "P",
         "contact_no": "+9198172398712",
         "dob":"1950-10-10",
         "address":"White house, USA"

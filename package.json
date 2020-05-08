@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "env-cmd -f config/test.env jest --config ./jest.config.json --coverage",
+    "test": "env-cmd -f config/test.env jest --config ./jest.config.json --coverage --detectOpenHandles",
     "test:debug": "env-cmd -f config/test.env node --inspect-brk ./node_modules/jest/bin/jest.js --runInBand test/system_admin.spec.js",
     "lint": "eslint src/**/*.js",
     "dev": "env-cmd -f config/dev.env nodemon src/app.js",

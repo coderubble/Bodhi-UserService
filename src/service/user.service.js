@@ -1,15 +1,15 @@
-const ClinicUser = require("../models/clinic_user.model");
-const User = require("../models/user.model");
+const models = require("../models")
+const ClinicUser = models.clinic_user;
+const User = models.user;
 const { generateAuthToken } = require("../utility/token");
 const bcrypt = require("bcryptjs");
-const { sequelize } = require("../db/database");
+const sequelize = models.sequelize;
 const { CLINIC_ADMIN, CLINIC_USER, SYSTEM_ADMIN, PATIENT } = require("../constants/constants")
 
 exports.userLogin = function ({ email_id, password }, callback) {
   User.findOne({
     where: { email_id }
   }).then((user) => {
-    console.log(`Userlogin:${email_id}>>>>>${password}`);
     bcrypt.compare(password, user.password, async function (error, result) {
       if (error) throw new Error('Incorrect Username or Password');
       //If passwords match,check user_type
@@ -87,7 +87,7 @@ exports.userInsert = function (userData, loggedInUser, callback) {
     if (hash) {
       let transaction = null;
       try {
-        transaction = await sequelize().transaction();
+        transaction = await sequelize.transaction();
         const user = await User.create({ ...userData, password: hash }, { transaction });
         console.log(`Created user:${JSON.stringify(user)}`);
         if (userData.user_type !== PATIENT) {
