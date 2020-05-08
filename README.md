@@ -6,14 +6,14 @@ This Service is used to manage users of Bodhi application.
 #### Create User:
 ```
     {
-        "email_id": "trump@usa.com",   
-        "password":"trump123",
-        "first_name":"Donald",
-        "last_name":"Trump",
+        "email_id": "super@bodhi.com",   
+        "password":"default-password-is-to-be-changed",
+        "first_name":"Super",
+        "last_name":"Admin",
         "user_type": "S",
-        "contact_no": "+9198172398712",
-        "dob":"1950-10-10",
-        "address":"White house, USA"
+        "contact_no": "+61000000000",
+        "dob":"1970-01-01",
+        "address":"Bodhi, USA"
     }
     {
         "email_id": "Admin@usa.com",   
@@ -82,3 +82,7 @@ see [Docs](Docs/DevDb/)
 ## TODO 
 * write integeration test project
 * https://github.com/slanatech/swagger-stats
+## migration
+```
+$ NODE_ENV=dev npx sequelize-cli db:migrate
+```

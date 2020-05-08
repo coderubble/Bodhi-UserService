@@ -1,4 +1,4 @@
-const models = require("../models")
+const models = require("../models");
 const ClinicUser = models.clinic_user;
 const User = models.user;
 const { generateAuthToken } = require("../utility/token");
