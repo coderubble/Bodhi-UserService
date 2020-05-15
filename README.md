@@ -84,5 +84,5 @@ see [Docs](Docs/DevDb/)
 * https://github.com/slanatech/swagger-stats
 ## migration
 ```
-$ NODE_ENV=dev npx sequelize-cli db:migrate
+$ ./node_modules/.bin/env-cmd -f ./config/linux.env npx sequelize-cli db:migrate
 ```
