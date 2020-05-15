@@ -82,6 +82,7 @@ see [Docs](Docs/DevDb/)
 ## TODO 
 * write integeration test project
 * https://github.com/slanatech/swagger-stats
+
 ## migration
 ```
 $ ./node_modules/.bin/env-cmd -f ./config/linux.env npx sequelize-cli db:migrate
