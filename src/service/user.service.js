@@ -11,24 +11,30 @@ exports.userLogin = function ({ email_id, password }, callback) {
     where: { email_id }
   }).then((user) => {
     bcrypt.compare(password, user.password, async function (error, result) {
-      if (error) throw new Error('Incorrect Username or Password');
       //If passwords match,check user_type
       if (result) {
         //If user_type is Clinic Admin or Clinic User,get clinic_id from ClinicUser table and set it to user object
         let user_clone = { email_id: user.email_id, user_type: user.user_type, clinic_id: null }
-        if ([CLINIC_ADMIN, CLINIC_USER].includes(user.user_type)) {
+        if ([ CLINIC_ADMIN, CLINIC_USER ].includes(user.user_type)) {
           await ClinicUser.findOne({ where: { email_id } }).then((clinic_user) => {
             user_clone.clinic_id = clinic_user.clinic_id;
           })
         }
-        callback(null, generateAuthToken(user_clone));
+        const authToken = generateAuthToken(user_clone);
+        const loginResult = {
+          token: authToken,
+          email_id: user.email_id,
+          first_name: user.first_name,
+          last_name: user.last_name,
+        }
+        return callback(null, loginResult);
       } else {
-        callback("Incorrect Username or Password");
+        return callback({error});
       }
     });
   }).catch((error) => {
     console.log(`Catch Login Error: ${error}`);
-    callback("User not found");
+    callback(`No such user`);
   });
 };
 
@@ -52,9 +58,9 @@ exports.userGetAll = function ({ from, to }, { user_type, clinic_id }, callback)
     sequelize.query(select_query, {
       type: User.SELECT
     }).then((records) => {
-      callback(null, records[0]);
+      return callback(null, records[ 0 ]);
     }).catch((err) => {
-      callback(err);
+      return callback(err);
     })
   }
   catch (err) {
@@ -66,16 +72,16 @@ exports.userGetByEmail = function ({ email_id }, callback) {
   User.findOne({
     where: { email_id }
   }).then((user) => {
-    callback(null, maskedUser(user));
+    return callback(null, maskedUser(user));
   }).catch((error) => {
     console.error(`Error: ${error}`);
-    callback(error);
+    return callback(error);
   });
 };
 
 function maskedUser(users) {
   if (!Array.isArray(users)) {
-    users = [users];
+    users = [ users ];
   }
   return users.map(user => Object.assign({}, { ...user.toJSON(), password: "******" }));
 }
@@ -97,15 +103,26 @@ exports.userInsert = function (userData, loggedInUser, callback) {
         }
         await transaction.commit();
         if (user) {
-          callback(null, { message: `Created Record: ${user.email_id}` });
+          callback(null, {
+            status: "Record Created Successfully",
+            email_id: user.email_id,
+            user_type: user.user_type
+          });
         }
       } catch (error) {
-        console.error(`Error: ${error}`);
         await transaction.rollback();
+        // const err = error.errors;
+        // console.log(`Err:${JSON.stringify(err)}`);
+
+        // let error_message = null;
+        // if (err) {
+        //   err.forEach(element => error_message = element.message);
+        //   return callback({ message: error_message });
+        // }
         callback(error);
       }
     } else {
-      callback("Insert Failed");
+      callback(err);
     }
   });
 };

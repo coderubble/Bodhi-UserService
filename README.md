@@ -53,6 +53,7 @@ This Service is used to manage users of Bodhi application.
 {"email_id":"shawn@bodhi.com","password":"sysAdmin123"}
 {"email_id": "peter@bodhi.com","password":"sysAdmin123"}
 {"email_id": "clark@bodhi.com","password":"sysAdmin123"}
+{"email_id": "super@bodhi.com","password":"default-password-is-to-be-changed"}
 ```
 
 ## Docker

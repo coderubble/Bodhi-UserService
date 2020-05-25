@@ -10,10 +10,9 @@ router.post("/login", (req, res) => {
   userLogin(req.body, (error, result) => {
     if (result) {
       res.setHeader("x-auth-token", result);
-      res.send(result);
+      res.status(200).send(result);
     } else {
-      console.log(`Login Error: ${JSON.stringify(error)}`);
-      res.status(500).send(error);
+      res.status(500).send({error});
     }
   });
 });
@@ -48,15 +47,15 @@ router.post("/", insertUser, validate(), function (req, res) {
     const token = req.headers["x-access-token"] || req.headers["authorization"];
     let loggedInUser;
     if (token) {
-      loggedInUser = decode_token(token)
+      loggedInUser = decode_token(token);
     }
     userInsert(req.body, loggedInUser, (error, result) => {
       if (result) {
         res.status(201).send(result);
       }
       else {
-        console.error(`Error: ${JSON.stringify(error)}`);
-        res.status(400).send({ message: error.errors });
+        console.error(`Insert Error: ${JSON.stringify(error)}`);
+        res.status(400).send(error);
       }
     });
   }
