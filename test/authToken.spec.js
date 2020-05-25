@@ -25,15 +25,16 @@ describe("Patient AuthToken Check", () => {
     expect(res.statusCode).toEqual(201);
   });
 
-  it("Get User Info from Token", async (done) => {
+  it("Get All User Should Fail for Patient", async (done) => {
     const res = await request(app)
       .post(`${process.env.API_PREFIX}/user/login`)
-      .send({ "email_id": patient.email_id, "password": patient.password }).then(async (response) => {
-        const token = response.text;
+      .send({ "email_id": patient.email_id, "password": patient.password })
+      .then(async (response) => {
+        const token = JSON.parse(response.text).token;
         const getUserInfoResponse = await request(app)
           .get(`${process.env.API_PREFIX}/user`)
-          .set("authorization", token);
-        expect(getUserInfoResponse.statusCode).toEqual(200);
+          .set("authorization", token)
+        expect(getUserInfoResponse.statusCode).toEqual(401);
         // const result = JSON.parse(getUserInfoResponse.text)
         // console.log(`Result:${JSON.stringify(result)}`);
         // expect(result).toEqual(patient.email_id, patient.user_type, null);

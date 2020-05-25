@@ -128,10 +128,7 @@ describe("Clinic Admin Flow", () => {
       .post(`${process.env.API_PREFIX}/user/login`)
       .send({ email_id: systemAdmin.email_id, password: systemAdmin.password })
       .then(async (response) => {
-        console.log(`response>>>>>${JSON.stringify(response)}`);
-
-        const token = response.text.token;
-        console.log(`token:${token}`);
+        const token = JSON.parse(response.text).token;
         const clinic_admin_response = await request(app)
           .post(`${process.env.API_PREFIX}/user`)
           .set("authorization", token)
@@ -140,80 +137,83 @@ describe("Clinic Admin Flow", () => {
       });
   });
 
-  // it("Login Failure", async () => {
-  //   const res = await request(app)
-  //     .post(`${process.env.API_PREFIX}/user/login`)
-  //     .send({ email_id: clinicAdmin.email_id, password: "wrongpassword" });
-  //   expect(res.text).toEqual("{\"error\":\"No such user or Incorrect Password\"}");
-  //   expect(res.statusCode).toEqual(500);
-  // });
+  it("Login Failure", async () => {
+    await request(app)
+      .post(`${process.env.API_PREFIX}/user/login`)
+      .send({ email_id: clinicAdmin.email_id, password: "wrongpassword" })
+      .then(async (res) => {
+        expect(res.text).toEqual("{\"error\":\"No such user or Incorrect Password\"}");
+        expect(res.statusCode).toEqual(500);
+      });
 
-  // it("Login as Clinic Admin,Can Create Clinic User & Patient::Not authorised to create Clinic Admin", async () => {
-  //   //Login as Clinic Admin & created 3 Clinic Users and One Patient
-  //   await request(app).post(`${process.env.API_PREFIX}/user/login`)
-  //     .send({ email_id: clinicAdmin.email_id, password: clinicAdmin.password })
-  //     .then(async (response) => {
-  //       const token = response.token;
-  //       const clinic_user_response = await request(app)
-  //         .post(`${process.env.API_PREFIX}/user`)
-  //         .set("authorization", token)
-  //         .send(clinicUser);
+  });
 
-  //       expect(clinic_user_response.status).toEqual(201);
+  it("Login as Clinic Admin,Can Create Clinic User & Patient::Not authorised to create Clinic Admin", async () => {
+    //Login as Clinic Admin & created 3 Clinic Users and One Patient
+    await request(app).post(`${process.env.API_PREFIX}/user/login`)
+      .send({ email_id: clinicAdmin.email_id, password: clinicAdmin.password })
+      .then(async (response) => {
+        const token = JSON.parse(response.text).token;
+        const clinic_user_response = await request(app)
+          .post(`${process.env.API_PREFIX}/user`)
+          .set("authorization", token)
+          .send(clinicUser);
 
-  //       const clinic_user1_response = await request(app)
-  //         .post(`${process.env.API_PREFIX}/user`)
-  //         .set("authorization", token)
-  //         .send(clinicUser1);
-  //       expect(clinic_user1_response.statusCode).toEqual(201);
+        expect(clinic_user_response.status).toEqual(201);
 
-  //       const clinic_user2_response = await request(app)
-  //         .post(`${process.env.API_PREFIX}/user`)
-  //         .set("authorization", token)
-  //         .send(clinicUser2);
-  //       expect(clinic_user2_response.statusCode).toEqual(201);
+        const clinic_user1_response = await request(app)
+          .post(`${process.env.API_PREFIX}/user`)
+          .set("authorization", token)
+          .send(clinicUser1);
+        expect(clinic_user1_response.statusCode).toEqual(201);
 
-  //       const patient_response = await request(app)
-  //         .post(`${process.env.API_PREFIX}/user`)
-  //         .set("authorization", token)
-  //         .send(patient);
-  //       expect(patient_response.statusCode).toEqual(201);
+        const clinic_user2_response = await request(app)
+          .post(`${process.env.API_PREFIX}/user`)
+          .set("authorization", token)
+          .send(clinicUser2);
+        expect(clinic_user2_response.statusCode).toEqual(201);
 
-  //       //Failed to create Clinic Admin 
-  //       const clinic_admin_response = await request(app)
-  //         .post(`${process.env.API_PREFIX}/user`)
-  //         .set("authorization", token)
-  //         .send(clinicAdmin);
-  //       expect(clinic_admin_response.statusCode).toEqual(403);
+        const patient_response = await request(app)
+          .post(`${process.env.API_PREFIX}/user`)
+          .set("authorization", token)
+          .send(patient);
+        expect(patient_response.statusCode).toEqual(201);
 
-  //       //Failed to update System Admin,Clinic User,Patient
-  //       const update_response = await request(app)
-  //         .put(`${process.env.API_PREFIX}/user`)
-  //         .set("authorization", token)
-  //         .send(systemAdmin_updated);
-  //       expect(update_response.statusCode).toEqual(403);
+        //Failed to create Clinic Admin 
+        const clinic_admin_response = await request(app)
+          .post(`${process.env.API_PREFIX}/user`)
+          .set("authorization", token)
+          .send(clinicAdmin);
+        expect(clinic_admin_response.statusCode).toEqual(403);
 
-  //       const update_clinicuser_response = await request(app)
-  //         .put(`${process.env.API_PREFIX}/user`)
-  //         .set("authorization", token)
-  //         .send(clinicUserUpdate);
-  //       expect(update_clinicuser_response.statusCode).toEqual(403);
+        //Failed to update System Admin,Clinic User,Patient
+        const update_response = await request(app)
+          .put(`${process.env.API_PREFIX}/user`)
+          .set("authorization", token)
+          .send(systemAdmin_updated);
+        expect(update_response.statusCode).toEqual(403);
 
-  //       const update_patient_response = await request(app)
-  //         .put(`${process.env.API_PREFIX}/user`)
-  //         .set("authorization", token)
-  //         .send(patientUpdated);
-  //       expect(update_patient_response.statusCode).toEqual(403);
+        const update_clinicuser_response = await request(app)
+          .put(`${process.env.API_PREFIX}/user`)
+          .set("authorization", token)
+          .send(clinicUserUpdate);
+        expect(update_clinicuser_response.statusCode).toEqual(403);
 
-  //       //Get all users in the clinic
-  //       const getall_response = await request(app)
-  //         .get(`${process.env.API_PREFIX}/user?from=0&to=20`)
-  //         .set("authorization", token);
-  //       const users = JSON.parse(getall_response.text) || []
-  //       result = users.map(user => {
-  //         return user.email_id;
-  //       })
-  //       expect(result).toEqual(expect.not.arrayContaining([systemAdmin.email_id, patient.email_id, clinicAdmin.email_id]));
-  //     })
-  // });
+        const update_patient_response = await request(app)
+          .put(`${process.env.API_PREFIX}/user`)
+          .set("authorization", token)
+          .send(patientUpdated);
+        expect(update_patient_response.statusCode).toEqual(403);
+
+        //Get all users in the clinic
+        const getall_response = await request(app)
+          .get(`${process.env.API_PREFIX}/user?from=0&to=20`)
+          .set("authorization", token);
+        const users = JSON.parse(getall_response.text) || []
+        result = users.map(user => {
+          return user.email_id;
+        })
+        expect(result).toEqual(expect.not.arrayContaining([systemAdmin.email_id, patient.email_id, clinicAdmin.email_id]));
+      })
+  });
 });

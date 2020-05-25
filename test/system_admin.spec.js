@@ -121,7 +121,7 @@ describe("System Admin Flow", () => {
       .post(`${process.env.API_PREFIX}/user/login`)
       .send({ email_id: systemAdmin.email_id, password: systemAdmin.password })
       .then(async (response) => {
-        const token = response.text;
+        const token = JSON.parse(response.text).token;
         const clinic_admin_response = await request(app)
           .post(`${process.env.API_PREFIX}/user`)
           .set("authorization", token)
