@@ -112,7 +112,7 @@ describe("System Admin Flow", () => {
     const res = await request(app)
       .post(`${process.env.API_PREFIX}/user/login`)
       .send({ email_id: systemAdmin.email_id, password: "wrongpassword" });
-    expect(res.text).toEqual("Incorrect Username or Password");
+    expect(res.text).toEqual("{\"error\":\"No such user or Incorrect Password\"}");
     expect(res.statusCode).toEqual(500);
   });
 

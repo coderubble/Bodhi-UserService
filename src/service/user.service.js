@@ -29,12 +29,12 @@ exports.userLogin = function ({ email_id, password }, callback) {
         }
         return callback(null, loginResult);
       } else {
-        return callback({error});
+        callback(`No such user or Incorrect Password`);
       }
     });
   }).catch((error) => {
     console.log(`Catch Login Error: ${error}`);
-    callback(`No such user`);
+    callback(`No such user or Incorrect Password`);
   });
 };
 
@@ -72,10 +72,13 @@ exports.userGetByEmail = function ({ email_id }, callback) {
   User.findOne({
     where: { email_id }
   }).then((user) => {
+    if (!user) {
+      return callback("User does not exist");
+    }
     return callback(null, maskedUser(user));
   }).catch((error) => {
-    console.error(`Error: ${error}`);
-    return callback(error);
+    console.error(`Service Error: ${error}`);
+    callback(error);
   });
 };
 
@@ -111,15 +114,13 @@ exports.userInsert = function (userData, loggedInUser, callback) {
         }
       } catch (error) {
         await transaction.rollback();
-        // const err = error.errors;
-        // console.log(`Err:${JSON.stringify(err)}`);
-
-        // let error_message = null;
-        // if (err) {
-        //   err.forEach(element => error_message = element.message);
-        //   return callback({ message: error_message });
-        // }
-        callback(error);
+        const err = error.errors;
+        let errorMessage = null;
+        if (err) {
+          err.forEach(element => errorMessage = element.message);
+          return callback(errorMessage);
+        }
+        return callback(error);
       }
     } else {
       callback(err);

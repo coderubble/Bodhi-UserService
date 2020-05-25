@@ -34,7 +34,7 @@ router.get("/:email_id", auth, (req, res) => {
       res.send(result);
     } else {
       console.error(`Error: ${JSON.stringify(error)}`);
-      res.status(400).send({ message: error.errors });
+      res.status(400).send({error});
     }
   })
 });
@@ -55,7 +55,7 @@ router.post("/", insertUser, validate(), function (req, res) {
       }
       else {
         console.error(`Insert Error: ${JSON.stringify(error)}`);
-        res.status(400).send(error);
+        res.status(400).send({error});
       }
     });
   }

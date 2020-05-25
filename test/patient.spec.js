@@ -23,7 +23,7 @@ describe("Patient Flow", () => {
       .post(`${process.env.API_PREFIX}/user/login`)
       .send({ "email_id": patient.email_id, "password": patient.password });
     expect(res.statusCode).toEqual(500);
-    expect(res.text).toEqual("User not found");
+    expect(res.text).toEqual("{\"error\":\"No such user or Incorrect Password\"}");
   });
 
   it("Create Patient", async () => {
@@ -45,6 +45,6 @@ describe("Patient Flow", () => {
       .post(`${process.env.API_PREFIX}/user/login`)
       .send({ email_id: patient.email_id, password: "wrongpassword" });
     expect(res.statusCode).toEqual(500);
-    expect(res.text).toEqual("Incorrect Username or Password");
+    expect(res.text).toEqual("{\"error\":\"No such user or Incorrect Password\"}");
   });
 });
