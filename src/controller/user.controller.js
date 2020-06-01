@@ -3,6 +3,7 @@ const router = express.Router();
 const { userLogin, userGetAll, userGetByEmail, userInsert, userUpdate, userDelete } = require("../service/user.service");
 const { validationResult } = require("express-validator");
 const { validate } = require("../middleware/validate");
+const {validationUpdate}=require("../middleware/validation_for_update");
 const auth = require("../middleware/auth");
 const { decode_token } = require("../utility/token");
 const { clinic, system, insertUser, updateUser } = require("../middleware/role_check");
@@ -61,7 +62,7 @@ router.post("/", insertUser, validate(), function (req, res) {
   }
 });
 
-router.put("/", auth, updateUser, validate(), (req, res) => {
+router.put("/", auth, updateUser, validationUpdate(), (req, res) => {
   const validationErrors = validationResult(req);
   if (!validationErrors.isEmpty()) {
     res.status(400).send(`Validation errors: ${JSON.stringify(validationErrors.array())}`);

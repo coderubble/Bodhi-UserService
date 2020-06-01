@@ -75,7 +75,7 @@ exports.userGetByEmail = function ({ email_id }, callback) {
     if (!user) {
       return callback("User does not exist");
     }
-    return callback(null, maskedUser(user));
+    return callback(null, maskedUser(user)[ 0 ]);
   }).catch((error) => {
     console.error(`Service Error: ${error}`);
     callback(error);
@@ -86,7 +86,7 @@ function maskedUser(users) {
   if (!Array.isArray(users)) {
     users = [ users ];
   }
-  return users.map(user => Object.assign({}, { ...user.toJSON(), password: "******" }));
+  return users.map(user => Object.assign({}, { ...user.toJSON(), password: "" }));
 }
 
 exports.userInsert = function (userData, loggedInUser, callback) {
@@ -128,17 +128,26 @@ exports.userInsert = function (userData, loggedInUser, callback) {
   });
 };
 
-exports.userUpdate = function ({ email_id, first_name, last_name, dob, address, contact_no }, callback) {
-  User.update({
+exports.userUpdate = function ({ email_id, password, first_name, last_name, dob, address, contact_no }, callback) {
+  let toUpdate = {
     first_name,
     last_name,
     dob,
     address,
     contact_no
-  }, {
+  }
+  if (password.length !== 0) {
+    try {
+      let hash = bcrypt.hashSync(password, Number(process.env.SALT));
+      toUpdate.password = hash;
+    } catch (err) {
+      throw err;
+    }
+  }
+  User.update(toUpdate, {
     where: { email_id }
   }).then((result) => {
-    callback(null, { message: `Updated Record: ${result}` });
+    callback(null, { updated : result===0?false:true });
   }).catch((error) => {
     console.error(`Error: ${error}`);
     callback(error);
