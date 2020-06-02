@@ -147,7 +147,7 @@ exports.userUpdate = function ({ email_id, password, first_name, last_name, dob,
   User.update(toUpdate, {
     where: { email_id }
   }).then((result) => {
-    callback(null, { updated : result===0?false:true });
+    callback(null, { updated: result === 0 ? false : true });
   }).catch((error) => {
     console.error(`Error: ${error}`);
     callback(error);
@@ -156,7 +156,7 @@ exports.userUpdate = function ({ email_id, password, first_name, last_name, dob,
 
 exports.userDelete = function ({ email_id }, callback) {
   User.destroy({ where: { email_id } }).then((result) => {
-    callback(null, { message: `Deleted Record: ${result}` });
+    callback(null, { deleted: result === 0 ? false : true });
   }).catch((error) => {
     console.error(`Error: ${error}`);
     callback(error);
