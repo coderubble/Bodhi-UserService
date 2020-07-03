@@ -75,10 +75,6 @@ $ image=coderubble/bodhi_user_service
 $ docker commit bodhi_user_service $image:$version
 $ docker tag $image:$version 
 $ docker push $image:$latest 
-#### Starting postgres on docker 
-```
-see [Docs](Docs/DevDb/)
-```
 
 ## TODO 
 * write integeration test project
