@@ -13,7 +13,7 @@ app.use(process.env.API_PREFIX, routes);
 models.sequelize.sync().then(() => {
   if (process.env.NODE_ENV !== 'test') {
     app.listen(PORT, function () {
-      console.log("Server is running at Port " + PORT);
+      console.log(`Server was started on Port ${PORT}`);
     });
   }
 });
